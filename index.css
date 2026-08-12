@@ -575,6 +575,10 @@ strong {
     border-left: 4px solid var(--accent);
 }
 
+.core-quote strong {
+    color: #ffb84d; /* Bright warm gold-orange for maximum visibility and contrast on dark green background */
+}
+
 .stat-container {
     display: flex;
     gap: 24px;
