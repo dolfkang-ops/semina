@@ -267,7 +267,7 @@ const svgForestYoga = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
   <text x="70" y="39" fill="#ffffff" font-size="12" font-family="sans-serif" font-weight="bold" text-anchor="middle">산림치유 요가</text>
 </svg>`);
 
-// Full 12 Experience Programs from TQ_Project_3 Database
+// Full 12 Experience Programs from TQ_Project_3 Database with rich metadata
 const ForestPrograms = [
     {
         id: "prg01",
@@ -278,8 +278,16 @@ const ForestPrograms = [
         mode: "캠핑장 방문형",
         price: 5000,
         duration: 120,
+        minPeople: 1,
+        maxPeople: 30,
+        runDays: ["토", "일"],
+        runTime: "10:00",
         provider: "국립춘천숲체원 협력단",
+        location: "경기도 가평군 및 강원 춘천권역",
         description: "자연의 식물 염료에 대해 알아보고 손수건 천연염색 체험을 통해 자신만의 감수성을 천으로 표현하는 자연 친화적 산림교육 프로그램입니다.",
+        preparations: "손수건을 담아갈 지퍼백, 가벼운 활동복",
+        rainPolicy: "실내 공예체험관 또는 캠핑장 쉘터에서 정상 운영됩니다.",
+        cancelPolicy: "예약 2일 전 100% 환불, 1일 전 50%, 당일 취소 불가",
         imageUrl: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgNaturalDye
     },
@@ -292,8 +300,16 @@ const ForestPrograms = [
         mode: "캠핑장 방문형",
         price: 3000,
         duration: 120,
+        minPeople: 10,
+        maxPeople: 100,
+        runDays: ["화", "수", "목", "금", "토"],
+        runTime: "14:00",
         provider: "가평 산림복지교육회",
+        location: "경기도 가평군 북면 및 가평 일대",
         description: "전문 숲해설가와 함께 캠핑장 숲을 산책하며 오감을 통해 계절의 변화를 체험하고 생태적 감수성을 증진하는 국가 인증 숲해설 프로그램입니다.",
+        preparations: "편안한 운동화, 모자, 개인 식수",
+        rainPolicy: "우천 시 실내 시각자료 활용 숲 체험으로 대체 진행됩니다.",
+        cancelPolicy: "예약 1일 전까지 100% 취소 가능, 당일 취소 불가",
         imageUrl: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgForestCommentary
     },
@@ -306,8 +322,16 @@ const ForestPrograms = [
         mode: "캠핑장 방문형",
         price: 4000,
         duration: 120,
+        minPeople: 15,
+        maxPeople: 80,
+        runDays: ["화", "목", "금"],
+        runTime: "10:00",
         provider: "경기 산림환경교육센터",
+        location: "경기도 가평군 일대 산림 휴양지",
         description: "숲길과 시원한 계곡을 걸으며 이산화탄소를 흡수하고 산소를 공급하는 산림의 소중한 역할과 가치를 재미있게 배우는 탄소중립 숲체험입니다.",
+        preparations: "운동화 필수, 땀을 닦을 수건",
+        rainPolicy: "호우 경보 시 실내 시청각 기후환경 교육으로 변경 진행됩니다.",
+        cancelPolicy: "예약 1일 전까지 100% 취소 가능",
         imageUrl: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgCarbonForest
     },
@@ -320,8 +344,16 @@ const ForestPrograms = [
         mode: "키트 제공형",
         price: 7000,
         duration: 30,
+        minPeople: 1,
+        maxPeople: 200,
+        runDays: ["월", "화", "수", "목", "금", "토", "일"],
+        runTime: "자율",
         provider: "한국산림복지진흥원 파트너스",
+        location: "가평·양평 전 권역 캠핑장 (키트 배송/현장 수령)",
         description: "잣나무/솔잎과 편백오일 등 숲의 천연 재료를 믹스해 족욕을 즐길 수 있는 셀프 힐링 키트입니다. 텐트 사이트나 카라반에서 편리하게 휴식할 수 있습니다.",
+        preparations: "뜨거운 물, 족욕 대야",
+        rainPolicy: "키트 상품으로 날씨에 무관하게 텐트/실내에서 개별 체험 가능합니다.",
+        cancelPolicy: "키트 수령(출고) 전 100% 취소 가능, 출고 후 반품 불가",
         imageUrl: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgFootTalkKit
     },
@@ -334,8 +366,16 @@ const ForestPrograms = [
         mode: "캠핑장 방문형",
         price: 10000,
         duration: 90,
+        minPeople: 5,
+        maxPeople: 25,
+        runDays: ["토", "일"],
+        runTime: "11:00",
         provider: "가평 산림복지교육회",
+        location: "경기도 가평군 북면 일대",
         description: "전문 생태 교육 강사님이 직접 캠핑장으로 방문하여 캠핑장 내부 정원과 인근 숲속 산책로에서 곤충 및 식물을 함께 탐색하는 가족 맞춤형 숲 탐험 프로그램입니다.",
+        preparations: "모자, 편한 운동화, 모기 기피제",
+        rainPolicy: "우천 시 캠핑장 실내 대피소 또는 야외 천막 아래서 숲 부산물을 이용한 액자 만들기로 변경 진행됩니다.",
+        cancelPolicy: "3일 전 100%, 1일 전 50% 환불, 당일 환불 불가",
         imageUrl: "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgEcoAdventure
     },
@@ -348,8 +388,16 @@ const ForestPrograms = [
         mode: "캠핑장 방문형",
         price: 12000,
         duration: 120,
+        minPeople: 8,
+        maxPeople: 20,
+        runDays: ["금", "토", "일"],
+        runTime: "10:00",
         provider: "가평 산림레포츠 연합",
+        location: "경기도 가평군 가평읍 일대",
         description: "캠핑장에 자라나는 큰 나무 사이에 튼튼한 로프를 연결하여 짚라인, 로프 그네, 흔들다리 등 어린이 맞춤형 친환경 모험 놀이터를 구성하는 모험 스포츠 프로그램입니다.",
+        preparations: "긴 팔, 긴 바지, 미끄러지지 않는 운동화 필수",
+        rainPolicy: "비가 올 경우 로프 마찰 및 미끄러짐 위험으로 안전을 위해 100% 자동 취소 및 환불됩니다.",
+        cancelPolicy: "예약 1일 전까지 수수료 없이 취소 가능",
         imageUrl: "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgRopeAdventure
     },
@@ -362,8 +410,16 @@ const ForestPrograms = [
         mode: "외부 체험장 이동형",
         price: 8000,
         duration: 120,
+        minPeople: 10,
+        maxPeople: 50,
+        runDays: ["화", "수", "목", "금", "토", "일"],
+        runTime: "15:00",
         provider: "양평 숲스포츠클럽",
+        location: "경기도 양평군 단월면 일대",
         description: "숲길을 가볍게 트레킹하며 코스별로 설치된 특수 바스켓 골대에 소프트 플라잉 디스크를 던져 넣는, 남녀노소 즐겁게 내기할 수 있는 숲 스포츠 프로그램입니다.",
+        preparations: "활동하기 쉬운 캐주얼 운동복, 선글라스",
+        rainPolicy: "가벼운 보슬비는 진행 가능하며, 폭우 예보 시 사전 조율 후 취소 및 전액 환불처리 됩니다.",
+        cancelPolicy: "체험일 전날 18시 이전까지 100% 환불",
         imageUrl: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgFlyingDisc
     },
@@ -376,8 +432,16 @@ const ForestPrograms = [
         mode: "외부 체험장 이동형",
         price: 6000,
         duration: 120,
+        minPeople: 5,
+        maxPeople: 30,
+        runDays: ["수", "목", "금", "토", "일"],
+        runTime: "13:00",
         provider: "양평 산림치유원",
+        location: "경기도 양평군 양동면 일대",
         description: "소나무가 가득한 치유의 숲지대에 1인용 해먹을 직접 설치하고, 나무 그늘 아래 누워 전문 산림치유사의 힐링 사운드와 함께 피톤치드 명상을 즐기는 웰니스 프로그램입니다.",
+        preparations: "체온을 지킬 수 있는 겉옷 또는 담요, 개인 돗자리",
+        rainPolicy: "우천 시 야외 숲 공간 특성상 진행 불가하여 전액 환불됩니다.",
+        cancelPolicy: "체험 2일 전 100% 환불, 당일 불가",
         imageUrl: "forest_hammock.png",
         fallbackUrl: svgHammockStay
     },
@@ -390,8 +454,16 @@ const ForestPrograms = [
         mode: "키트 제공형",
         price: 15000,
         duration: 60,
+        minPeople: 1,
+        maxPeople: 100,
+        runDays: ["월", "화", "수", "목", "금", "토", "일"],
+        runTime: "자율",
         provider: "산림복지 목공예협동조합",
+        location: "가평·양평 전 권역 캠핑장 (키트 배송/현장 수령)",
         description: "편백나무와 잣나무 원목 조각들을 손으로 맞춘 뒤, 은하수 LED 전구를 넣어 피톤치드 향과 무드를 함께 누리는 고품격 핸드메이드 무드등 공예 키트입니다.",
+        preparations: "물티슈 (키트 내 목공 풀 등 모든 도구 포함)",
+        rainPolicy: "날씨 제한 없음. 캠핑 텐트 안이나 거실에서 편리하게 즐길 수 있습니다.",
+        cancelPolicy: "포장 배송 발송 전 언제든지 100% 환불 가능",
         imageUrl: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgWoodLampKit
     },
@@ -404,8 +476,16 @@ const ForestPrograms = [
         mode: "외부 체험장 이동형",
         price: 20000,
         duration: 180,
+        minPeople: 5,
+        maxPeople: 25,
+        runDays: ["금", "토", "일"],
+        runTime: "09:30",
         provider: "양평 숲치유학교",
+        location: "경기도 양평군 일대 자연휴양림",
         description: "천연 원시림 숲길을 맨발로 천천히 걸으며 황토의 혈류 개선 효과를 맛보고 깊은 산림의 피톤치드 산소를 온몸으로 호흡하는 친환경 명품 트레킹입니다.",
+        preparations: "트레킹 후 발을 닦을 작은 타올, 가벼운 신발(이동용)",
+        rainPolicy: "우천 시 돌 및 바닥 미끄럼 낙상 방지를 위해 체험이 취소되고 자동 환불됩니다.",
+        cancelPolicy: "3일 전 100%, 1일 전 30%, 당일 환불 불가",
         imageUrl: "https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgBarefootTrekking
     },
@@ -418,8 +498,16 @@ const ForestPrograms = [
         mode: "캠핑장 방문형",
         price: 15000,
         duration: 120,
+        minPeople: 5,
+        maxPeople: 30,
+        runDays: ["토", "일"],
+        runTime: "11:00",
         provider: "한국산림레포츠진흥회",
+        location: "경기도 가평군 북면 및 설악면 일대",
         description: "숲길 중간에 조성된 친환경 로프 어드벤처 구역에서 안전 헬멧과 보조줄을 장착하고 나무 사이를 스릴 있게 통과하는 청정 산림 액티비티 체험입니다.",
+        preparations: "활동이 편한 옷차림, 코팅 장갑(현장 대여 가능)",
+        rainPolicy: "우천 예보 시 안전을 위해 사전 취소 후 전액 환불됩니다.",
+        cancelPolicy: "2일 전까지 취소 가능",
         imageUrl: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgZiplineFly
     },
@@ -432,8 +520,16 @@ const ForestPrograms = [
         mode: "캠핑장 방문형",
         price: 10000,
         duration: 90,
+        minPeople: 4,
+        maxPeople: 15,
+        runDays: ["토", "일"],
+        runTime: "07:30",
         provider: "가평 요가앤숲 아카데미",
+        location: "경기도 가평군 가평읍 일대 캠핑장",
         description: "캠핑장의 상쾌한 아침을 열어주는 방문형 스트레칭 교실입니다. 싱그러운 새벽 공기와 피톤치드를 호흡하며 몸의 정렬과 피로를 푸는 심신 웰빙 프로그램입니다.",
+        preparations: "개인 매트 또는 돗자리, 따뜻한 겉옷",
+        rainPolicy: "우천 시 각 텐트 내에서 할 수 있는 힐링 스트레칭 강의(온라인/서적 배포) 또는 캠핑장 내 방풍 쉘터에서 축소 운영됩니다.",
+        cancelPolicy: "체험 당일 2시간 전까지 수수료 없이 취소 가능",
         imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600",
         fallbackUrl: svgForestYoga
     }
@@ -444,6 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initScrollSpy();
     initCounterAnimations();
     initProgramMatcher();
+    initProgramDetailModalEvents();
     initCamperSimulator();
     initStakeholderTabs();
     initSurveyForm();
@@ -588,28 +685,152 @@ function renderMatchCards(programs) {
     }
 
     programs.forEach(prg => {
-        const cardHtml = `
-            <div class="sim-program-card">
-                <div class="sim-img-box">
-                    <img src="${prg.imageUrl}" alt="${prg.title}" loading="lazy" onerror="this.onerror=null; if('${prg.fallbackUrl}') this.src='${prg.fallbackUrl}';">
-                    <span class="sim-cat-tag">${prg.category}</span>
-                    <span class="sim-mode-tag">${prg.mode}</span>
+        const card = document.createElement("div");
+        card.className = "sim-program-card";
+        card.setAttribute("title", "클릭하여 상세 내용 및 운영 규정 확인");
+        card.onclick = () => openProgramDetailModal(prg.id);
+
+        card.innerHTML = `
+            <div class="sim-img-box">
+                <img src="${prg.imageUrl}" alt="${prg.title}" loading="lazy" onerror="this.onerror=null; if('${prg.fallbackUrl}') this.src='${prg.fallbackUrl}';">
+                <span class="sim-cat-tag">${prg.category}</span>
+                <span class="sim-mode-tag">${prg.mode}</span>
+            </div>
+            <div class="sim-card-body">
+                <div>
+                    <h4>${prg.title}</h4>
+                    <p>${prg.description}</p>
                 </div>
-                <div class="sim-card-body">
-                    <div>
-                        <h4>${prg.title}</h4>
-                        <p>${prg.description}</p>
+                <div class="sim-card-footer">
+                    <span><i class="fa-solid fa-circle-user"></i> ${prg.provider}</span>
+                    <div class="sim-price">
+                        ${prg.price.toLocaleString()}<span>원/인</span>
                     </div>
-                    <div class="sim-card-footer">
-                        <span><i class="fa-solid fa-circle-user"></i> ${prg.provider}</span>
-                        <div class="sim-price">
-                            ${prg.price.toLocaleString()}<span>원/인</span>
-                        </div>
-                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                    <span class="btn-card-detail-hint"><i class="fa-solid fa-circle-info"></i> 상세정보 보기</span>
                 </div>
             </div>
         `;
-        container.innerHTML += cardHtml;
+        container.appendChild(card);
+    });
+}
+
+// --- Program Detail Modal Functions (Reference TQ_Project_3) ---
+window.openProgramDetailModal = function(programId) {
+    const prg = ForestPrograms.find(p => p.id === programId);
+    if (!prg) return;
+
+    const modal = document.getElementById("program-detail-modal");
+    const titleEl = document.getElementById("modal-prg-title");
+    const categoryEl = document.getElementById("modal-prg-category");
+    const bodyEl = document.getElementById("modal-prg-body");
+
+    if (!modal || !titleEl || !categoryEl || !bodyEl) return;
+
+    titleEl.textContent = prg.title;
+    categoryEl.textContent = prg.category;
+
+    const runDaysText = prg.runDays ? prg.runDays.join(", ") : "상시 운영";
+    const runTimeText = prg.runTime || "시간 협의";
+    const minP = prg.minPeople || 1;
+    const maxP = prg.maxPeople || 50;
+
+    let modeDescription = "";
+    if (prg.mode === "키트 제공형") {
+        modeDescription = "체험키트 (캠핑장 현장 수령 또는 텐트 배송)";
+    } else if (prg.mode === "캠핑장 방문형") {
+        modeDescription = "전문 강사/지도사 캠핑장 직접 방문 파견";
+    } else {
+        modeDescription = "캠핑장 인근 외부 체험장/자연휴양림 이동 (차량 15~30분 내)";
+    }
+
+    bodyEl.innerHTML = `
+        <div class="details-summary-section">
+            <div class="details-image-box">
+                <img src="${prg.imageUrl}" alt="${prg.title}" onerror="this.onerror=null; if('${prg.fallbackUrl}') this.src='${prg.fallbackUrl}';">
+            </div>
+            <div class="details-headline">
+                <div class="badge-row">
+                    <span class="badge-category">${prg.category}</span>
+                    <span class="badge-mode">${prg.mode}</span>
+                </div>
+                <h4>${prg.title}</h4>
+                <p class="org-info"><i class="fa-solid fa-landmark"></i> <strong>운영기관:</strong> ${prg.provider}</p>
+                <p class="details-desc-short">${prg.description}</p>
+            </div>
+        </div>
+
+        <h5 class="details-section-title"><i class="fa-solid fa-circle-info"></i> 프로그램 세부 운영 스펙</h5>
+        <div class="details-grid">
+            <div class="details-item">
+                <strong>활동 권역 및 위치</strong>
+                <span>${prg.region} (${prg.location || '권역 내 협력 캠핑장'})</span>
+            </div>
+            <div class="details-item">
+                <strong>운영 형태</strong>
+                <span>${modeDescription}</span>
+            </div>
+            <div class="details-item">
+                <strong>소요시간 및 진행 일정</strong>
+                <span>${prg.duration}분 | 매주 [${runDaysText}] (${runTimeText})</span>
+            </div>
+            <div class="details-item">
+                <strong>회당 참여 정원</strong>
+                <span>${minP}명 ~ ${maxP}명 (최소~최대)</span>
+            </div>
+            <div class="details-item">
+                <strong>체험 참가비</strong>
+                <span style="color: var(--accent); font-weight: 800;">${prg.price === 0 ? "무료" : prg.price.toLocaleString() + "원 / 1인"}</span>
+            </div>
+            <div class="details-item">
+                <strong>우천 시 운영 대안</strong>
+                <span>${prg.rainPolicy || '실내 공간 대체 또는 100% 자동 환불'}</span>
+            </div>
+        </div>
+
+        <h5 class="details-section-title"><i class="fa-solid fa-clipboard-check"></i> 준비물 및 운영 규정</h5>
+        <div class="details-paragraphs">
+            <p><strong><i class="fa-solid fa-suitcase"></i> 필수 준비물:</strong> ${prg.preparations || '편안한 복장 및 운동화'}</p>
+            <p><strong><i class="fa-solid fa-clock-rotate-left"></i> 예약 취소 및 환불:</strong> ${prg.cancelPolicy || '체험일 1일 전까지 100% 취소 가능'}</p>
+            <div class="details-callout">
+                <i class="fa-solid fa-shield-halved"></i> <strong>진흥원 지원 보증:</strong> 본 프로그램은 한국산림복지진흥원 시범사업 협력 모델로 안전 가이드라인 및 전문 자격을 갖춘 산림복지사가 진행합니다.
+            </div>
+        </div>
+    `;
+
+    modal.style.display = "flex";
+};
+
+window.closeProgramDetailModal = function() {
+    const modal = document.getElementById("program-detail-modal");
+    if (modal) modal.style.display = "none";
+};
+
+function initProgramDetailModalEvents() {
+    const modal = document.getElementById("program-detail-modal");
+    const btnClose = document.getElementById("btn-close-prg-modal");
+    const btnCloseBottom = document.getElementById("btn-close-prg-modal-bottom");
+
+    if (btnClose) {
+        btnClose.addEventListener("click", window.closeProgramDetailModal);
+    }
+    if (btnCloseBottom) {
+        btnCloseBottom.addEventListener("click", window.closeProgramDetailModal);
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                window.closeProgramDetailModal();
+            }
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal && modal.style.display === "flex") {
+            window.closeProgramDetailModal();
+        }
     });
 }
 
