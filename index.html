@@ -26,6 +26,7 @@
                 <ul>
                     <li><a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> 시작하기</a></li>
                     <li><a href="#survey" class="nav-link survey-link highlight-link"><i class="fa-solid fa-file-signature"></i> 13. 참여 의향서 등록</a></li>
+                    <li><a href="#program-registration" class="nav-link highlight-link"><i class="fa-solid fa-calendar-plus"></i> 14. 체험 프로그램 등록</a></li>
                     <li><a href="#background" class="nav-link"><i class="fa-solid fa-circle-info"></i> 추진 배경 & 필요성</a></li>
                     <li><a href="#simulator" class="nav-link highlight-link"><i class="fa-solid fa-wand-magic-sparkles"></i> 숲체험 매칭기</a></li>
                     <li><a href="#goals" class="nav-link"><i class="fa-solid fa-bullseye"></i> 사업 목표</a></li>
@@ -187,6 +188,10 @@
                                         <input type="checkbox" name="survey-specialty" value="숲트레킹">
                                         <span><i class="fa-solid fa-shoe-prints"></i> 숲트레킹</span>
                                     </label>
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="기타">
+                                        <span><i class="fa-solid fa-asterisk"></i> 기타</span>
+                                    </label>
                                 </div>
                                 <div id="specialty-error" class="specialty-error-msg" style="display: none;">
                                     <i class="fa-solid fa-circle-exclamation"></i> 주요 전문 분야를 최소 1개 이상 선택해 주세요.
@@ -252,6 +257,249 @@
                                 <span>시범사업 문의전화 : <a href="tel:010-4226-5988"><strong>010-4226-5988</strong></a></span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 14: PROGRAM REGISTRATION FOR CERTIFIED COMPANIES -->
+            <section id="program-registration" class="section program-reg-section">
+                <div class="section-title-wrapper">
+                    <span class="section-num">14</span>
+                    <h2>산림전문업 체험 프로그램 상세 등록</h2>
+                    <p class="section-subtitle-text">시범사업 참여 신청을 완료한 전문업체는 등록된 전화번호 인증 후 실제 공급할 숲체험 프로그램의 세부 운영 스펙을 등록합니다.</p>
+                </div>
+
+                <!-- STEP 1: Phone Verification Box -->
+                <div class="phone-auth-container card">
+                    <div class="auth-header-row">
+                        <span class="auth-step-badge"><i class="fa-solid fa-shield-halved"></i> STEP 1</span>
+                        <h3>등록 전문업체 전화번호 확인 및 인증</h3>
+                    </div>
+                    <p class="auth-desc">참여 신청 시 입력하신 대표자 또는 담당자 연락처(전화번호)를 입력하여 전문업체 등록 여부를 확인해 주세요.</p>
+                    
+                    <div class="auth-input-group" id="auth-input-group">
+                        <div class="input-with-icon">
+                            <i class="fa-solid fa-phone"></i>
+                            <input type="text" id="auth-phone-input" placeholder="전화번호 입력 (예: 010-1234-5678 또는 01012345678)">
+                        </div>
+                        <button type="button" id="btn-verify-phone" class="btn btn-verify-phone">
+                            <i class="fa-solid fa-magnifying-glass"></i> 등록 업체 확인
+                        </button>
+                    </div>
+
+                    <!-- State 1-A: Verification Success Banner -->
+                    <div id="auth-success-banner" class="auth-success-banner" style="display: none;">
+                        <div class="success-info">
+                            <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                            <div class="success-texts">
+                                <h4>전문업체 인증 완료: <span id="auth-company-name"></span></h4>
+                                <p>
+                                    <strong>대표자:</strong> <span id="auth-rep-name"></span> &nbsp;|&nbsp; 
+                                    <strong>소재지:</strong> <span id="auth-location"></span> &nbsp;|&nbsp; 
+                                    <strong>연락처:</strong> <span id="auth-contact-num"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" id="btn-reset-phone-auth" class="btn btn-reset-auth" title="다른 번호로 조회">
+                            <i class="fa-solid fa-arrows-rotate"></i> 다른 번호로 조회
+                        </button>
+                    </div>
+
+                    <!-- State 1-B: Verification Fail Banner -->
+                    <div id="auth-fail-banner" class="auth-fail-banner" style="display: none;">
+                        <div class="fail-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                        <div class="fail-texts">
+                            <h4>등록된 업체를 찾을 수 없습니다</h4>
+                            <p>입력하신 전화번호로 등록된 참여 신청 내역이 없습니다. 번호를 다시 확인하시거나 상단의 <strong>[13. 산림복지 전문업체 참여 신청]</strong>을 먼저 접수해 주세요.</p>
+                        </div>
+                        <a href="#survey" class="btn btn-goto-survey"><i class="fa-solid fa-arrow-up"></i> 참여 신청 작성하러 가기</a>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Experience Program Intake Form (Locked until authenticated) -->
+                <div class="program-reg-container card" id="program-reg-container">
+                    <!-- Locked State Placeholder -->
+                    <div id="reg-locked-placeholder" class="reg-locked-placeholder">
+                        <div class="locked-icon"><i class="fa-solid fa-lock"></i></div>
+                        <h4>체험 프로그램 등록 잠김</h4>
+                        <p>위 <strong>STEP 1</strong>에서 등록 전문업체 전화번호를 확인하시면 상세 프로그램 등록 폼이 활성화됩니다.</p>
+                    </div>
+
+                    <!-- Unlocked Active Form -->
+                    <div id="reg-active-form-wrapper" style="display: none;">
+                        <div class="reg-form-header">
+                            <div class="reg-badge-row">
+                                <span class="auth-step-badge active"><i class="fa-solid fa-clipboard-list"></i> STEP 2</span>
+                                <span class="reg-provider-tag"><i class="fa-solid fa-building"></i> 공급 전문업체: <strong id="reg-provider-name">-</strong></span>
+                            </div>
+                            <h3>체험 프로그램 세부 운영 스펙 입력</h3>
+                            <p class="reg-form-intro">숲체험 상세페이지 규격에 맞춰 프로그램 정보를 입력해 주세요. 등록된 프로그램은 관리자 승인 후 땡큐캠핑 예약 시스템 및 매칭 시뮬레이터에 반영됩니다.</p>
+                        </div>
+
+                        <form id="custom-program-form">
+                            <!-- Row 1: Title & Category -->
+                            <div class="form-row-3">
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label for="prg-reg-title"><i class="fa-solid fa-heading"></i> 프로그램명 (타이틀)</label>
+                                    <input type="text" id="prg-reg-title" placeholder="예: [특화] 피톤치드 오감만족 숲치유 트레킹" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-category"><i class="fa-solid fa-shapes"></i> 체험 분야</label>
+                                    <select id="prg-reg-category" required>
+                                        <option value="숲해설">숲해설 (숲해설/생태)</option>
+                                        <option value="산림치유" selected>산림치유 (힐링/테라피)</option>
+                                        <option value="유아숲체험">유아숲체험 (어린이)</option>
+                                        <option value="산림교육">산림교육 (생태학습)</option>
+                                        <option value="산림레포츠">산림레포츠 (밧줄/트리클라이밍)</option>
+                                        <option value="자연공예">자연공예 (목공/자연물)</option>
+                                        <option value="숲트레킹">숲트레킹 (노르딕워킹/맨발)</option>
+                                        <option value="기타">기타 (기타 융합/특화 프로그램)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Mode, Region, Target -->
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="prg-reg-mode"><i class="fa-solid fa-route"></i> 운영 형태</label>
+                                    <select id="prg-reg-mode" required>
+                                        <option value="캠핑장 방문형" selected>캠핑장 방문형 (지도사 직접 파견)</option>
+                                        <option value="외부 체험장 이동형">외부 체험장 이동형 (차량 이동)</option>
+                                        <option value="키트 제공형">키트 제공형 (자율 텐트 체험)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-region"><i class="fa-solid fa-map-location-dot"></i> 활동 권역</label>
+                                    <select id="prg-reg-region" required>
+                                        <option value="가평" selected>경기 가평군</option>
+                                        <option value="양평">경기 양평군</option>
+                                        <option value="가평/양평 전역">가평 및 양평 전역</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-target"><i class="fa-solid fa-users"></i> 주요 타겟 고객</label>
+                                    <select id="prg-reg-target" required>
+                                        <option value="family" selected>가족 및 부모/자녀 동반</option>
+                                        <option value="kids">유아 및 어린이 중심</option>
+                                        <option value="healing">중장년층 및 웰니스/힐링</option>
+                                        <option value="sports">레포츠 및 트레킹 선호 단체</option>
+                                        <option value="all">전 연령 누구나</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Location Detail, Duration, Price, Min Cost -->
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="prg-reg-location"><i class="fa-solid fa-location-dot"></i> 세부 진행 장소</label>
+                                    <input type="text" id="prg-reg-location" placeholder="예: 캠핑장 내 잔디마당 및 인근 둘레길" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-duration"><i class="fa-solid fa-clock"></i> 1회 소요시간 (분)</label>
+                                    <input type="number" id="prg-reg-duration" placeholder="예: 90" min="10" step="5" value="90" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="prg-reg-price"><i class="fa-solid fa-won-sign"></i> 1인당 체험 참가비 (원)</label>
+                                    <input type="number" id="prg-reg-price" placeholder="예: 15000 (무료는 0)" min="0" step="1000" value="15000" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-min-cost"><i class="fa-solid fa-coins"></i> 최소 운영 비용 (원/회)</label>
+                                    <input type="number" id="prg-reg-min-cost" placeholder="예: 100000 (최소 출발/운영 보장 비용)" min="0" step="10000" value="100000" required>
+                                </div>
+                            </div>
+
+                            <!-- Row 4: Min/Max People & Run Days & Time -->
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label><i class="fa-solid fa-user-group"></i> 회당 정원 (최소 ~ 최대 명)</label>
+                                    <div class="dual-inputs">
+                                        <input type="number" id="prg-reg-min-people" placeholder="최소" min="1" value="4" required>
+                                        <span class="range-tilde">~</span>
+                                        <input type="number" id="prg-reg-max-people" placeholder="최대" min="1" value="20" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-run-time"><i class="fa-solid fa-business-time"></i> 운영 시간대</label>
+                                    <input type="text" id="prg-reg-run-time" placeholder="예: 10:00~12:00, 14:00~16:00" value="10:00~11:30" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fa-solid fa-calendar-check"></i> 운영 요일 선택</label>
+                                    <div class="days-checkbox-row">
+                                        <label class="day-chip"><input type="checkbox" name="prg-days" value="월"><span>월</span></label>
+                                        <label class="day-chip"><input type="checkbox" name="prg-days" value="화"><span>화</span></label>
+                                        <label class="day-chip"><input type="checkbox" name="prg-days" value="수"><span>수</span></label>
+                                        <label class="day-chip"><input type="checkbox" name="prg-days" value="목"><span>목</span></label>
+                                        <label class="day-chip"><input type="checkbox" name="prg-days" value="금"><span>금</span></label>
+                                        <label class="day-chip"><input type="checkbox" name="prg-days" value="토" checked><span>토</span></label>
+                                        <label class="day-chip"><input type="checkbox" name="prg-days" value="일" checked><span>일</span></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row 5: Detailed Description -->
+                            <div class="form-group">
+                                <label for="prg-reg-desc"><i class="fa-solid fa-align-left"></i> 프로그램 상세 소개 및 커리큘럼</label>
+                                <textarea id="prg-reg-desc" rows="3" placeholder="캠퍼들에게 노출될 프로그램의 매력과 단계별 진행 내용(도입-전개-마무리)을 설명해 주세요." required></textarea>
+                            </div>
+
+                            <!-- Row 6: Preparations, Rain Policy, Cancel Policy -->
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="prg-reg-prep"><i class="fa-solid fa-suitcase"></i> 필수 준비물 및 복장</label>
+                                    <input type="text" id="prg-reg-prep" placeholder="예: 편안한 복장, 운동화, 개인 텀블러" value="편안한 복장 및 운동화, 개인 물병" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-rain"><i class="fa-solid fa-cloud-showers-heavy"></i> 우천 시 대안</label>
+                                    <input type="text" id="prg-reg-rain" placeholder="예: 캠핑장 실내 공간 대체 진행 또는 100% 자동 환불" value="실내 공간 대체 진행 또는 100% 자동 환불" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prg-reg-cancel"><i class="fa-solid fa-clock-rotate-left"></i> 취소 및 환불 규정</label>
+                                    <input type="text" id="prg-reg-cancel" placeholder="예: 체험일 1일 전까지 100% 취소 가능" value="체험일 1일 전까지 100% 무료 취소 가능 (당일 취소 불가)" required>
+                                </div>
+                            </div>
+
+                            <!-- Row 7: Preset Image Selection -->
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-image"></i> 대표 썸네일 이미지 선택</label>
+                                <div class="image-preset-grid">
+                                    <label class="img-preset-label">
+                                        <input type="radio" name="prg-reg-img" value="dye" checked>
+                                        <div class="preset-card">
+                                            <div class="preset-thumb" style="background: linear-gradient(135deg, #165b33 0%, #104225 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                            <span>자연염색 / 공예</span>
+                                        </div>
+                                    </label>
+                                    <label class="img-preset-label">
+                                        <input type="radio" name="prg-reg-img" value="tree">
+                                        <div class="preset-card">
+                                            <div class="preset-thumb" style="background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;"><i class="fa-solid fa-tree"></i></div>
+                                            <span>숲해설 / 오감체험</span>
+                                        </div>
+                                    </label>
+                                    <label class="img-preset-label">
+                                        <input type="radio" name="prg-reg-img" value="rope">
+                                        <div class="preset-card">
+                                            <div class="preset-thumb" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;"><i class="fa-solid fa-person-hiking"></i></div>
+                                            <span>밧줄놀이 / 레포츠</span>
+                                        </div>
+                                    </label>
+                                    <label class="img-preset-label">
+                                        <input type="radio" name="prg-reg-img" value="trail">
+                                        <div class="preset-card">
+                                            <div class="preset-thumb" style="background: linear-gradient(135deg, #059669 0%, #065f46 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;"><i class="fa-solid fa-shoe-prints"></i></div>
+                                            <span>피톤치드 맨발트레킹</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-submit-program">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> 체험 프로그램 등록 완료
+                            </button>
+                        </form>
                     </div>
                 </div>
             </section>
@@ -1225,18 +1473,39 @@
                     <div class="admin-modal-top-bar">
                         <div class="admin-status-left">
                             <span class="admin-status-badge"><i class="fa-solid fa-circle-check"></i> 관리자 인증 완료</span>
-                            <span class="admin-total-text">총 등록 업체: <strong id="admin-modal-reg-count">0</strong>개소</span>
                         </div>
                         <div class="admin-status-right">
                             <button id="btn-admin-logout" class="btn btn-admin-logout" title="관리자 로그아웃"><i class="fa-solid fa-arrow-right-from-bracket"></i> 로그아웃</button>
                         </div>
                     </div>
 
-                    <!-- List of submitted companies -->
-                    <div class="admin-modal-card-list" id="mock-preview-result">
-                        <div class="mock-card-empty-state">
-                            <i class="fa-solid fa-folder-open"></i>
-                            <p>현재 등록된 전문업체 신청 내역이 없습니다.</p>
+                    <!-- Admin Navigation Tabs -->
+                    <div class="admin-nav-tabs" id="admin-tabs">
+                        <button type="button" class="admin-nav-tab-btn active" data-admin-tab="companies">
+                            <i class="fa-solid fa-building"></i> 참여 전문업체 (<span id="admin-modal-reg-count">0</span>개소)
+                        </button>
+                        <button type="button" class="admin-nav-tab-btn" data-admin-tab="programs">
+                            <i class="fa-solid fa-tree"></i> 등록 체험 프로그램 (<span id="admin-modal-prg-count">0</span>건)
+                        </button>
+                    </div>
+
+                    <!-- Tab Pane 1: Submitted Companies -->
+                    <div id="admin-pane-companies" class="admin-tab-pane active">
+                        <div class="admin-modal-card-list" id="mock-preview-result">
+                            <div class="mock-card-empty-state">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <p>현재 등록된 전문업체 신청 내역이 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Pane 2: Registered Experience Programs -->
+                    <div id="admin-pane-programs" class="admin-tab-pane" style="display: none;">
+                        <div class="admin-modal-card-list" id="admin-prg-list-result">
+                            <div class="mock-card-empty-state">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <p>현재 등록된 체험 프로그램 내역이 없습니다.</p>
+                            </div>
                         </div>
                     </div>
                 </div>

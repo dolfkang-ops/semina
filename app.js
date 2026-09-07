@@ -544,6 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initCamperSimulator();
     initStakeholderTabs();
     initSurveyForm();
+    initProgramRegistration();
 });
 
 // --- 3. Scroll Spy (Active Menu Indicator) ---
@@ -717,8 +718,13 @@ function renderMatchCards(programs) {
 }
 
 // --- Program Detail Modal Functions (Reference TQ_Project_3) ---
-window.openProgramDetailModal = function(programId) {
-    const prg = ForestPrograms.find(p => p.id === programId);
+window.openProgramDetailModal = function(programOrId) {
+    let prg = null;
+    if (typeof programOrId === "object" && programOrId !== null) {
+        prg = programOrId;
+    } else {
+        prg = ForestPrograms.find(p => p.id === programOrId) || RegisteredPrograms.find(p => p.id === programOrId);
+    }
     if (!prg) return;
 
     const modal = document.getElementById("program-detail-modal");
@@ -745,6 +751,10 @@ window.openProgramDetailModal = function(programId) {
         modeDescription = "캠핑장 인근 외부 체험장/자연휴양림 이동 (차량 15~30분 내)";
     }
 
+    const providerName = prg.provider || prg.orgName || "산림복지전문업";
+    const priceFormatted = Number(prg.price) === 0 ? "무료" : Number(prg.price).toLocaleString() + "원 / 1인";
+    const locationText = prg.location || '권역 내 협력 캠핑장';
+
     bodyEl.innerHTML = `
         <div class="details-summary-section">
             <div class="details-image-box">
@@ -756,7 +766,7 @@ window.openProgramDetailModal = function(programId) {
                     <span class="badge-mode">${prg.mode}</span>
                 </div>
                 <h4>${prg.title}</h4>
-                <p class="org-info"><i class="fa-solid fa-landmark"></i> <strong>운영기관:</strong> ${prg.provider}</p>
+                <p class="org-info"><i class="fa-solid fa-landmark"></i> <strong>운영기관:</strong> ${providerName}</p>
                 <p class="details-desc-short">${prg.description}</p>
             </div>
         </div>
@@ -765,7 +775,7 @@ window.openProgramDetailModal = function(programId) {
         <div class="details-grid">
             <div class="details-item">
                 <strong>활동 권역 및 위치</strong>
-                <span>${prg.region} (${prg.location || '권역 내 협력 캠핑장'})</span>
+                <span>${prg.region} (${locationText})</span>
             </div>
             <div class="details-item">
                 <strong>운영 형태</strong>
@@ -781,7 +791,11 @@ window.openProgramDetailModal = function(programId) {
             </div>
             <div class="details-item">
                 <strong>체험 참가비</strong>
-                <span style="color: var(--accent); font-weight: 800;">${prg.price === 0 ? "무료" : prg.price.toLocaleString() + "원 / 1인"}</span>
+                <span style="color: var(--accent); font-weight: 800;">${priceFormatted}</span>
+            </div>
+            <div class="details-item">
+                <strong>최소 운영 비용 (회당)</strong>
+                <span style="color: var(--primary-dark); font-weight: 800;">${prg.minCost ? Number(prg.minCost).toLocaleString() + '원' : '별도 협의 (기본 정원 기준)'}</span>
             </div>
             <div class="details-item">
                 <strong>우천 시 운영 대안</strong>
@@ -948,6 +962,7 @@ function initStakeholderTabs() {
 const ADMIN_PASSWORD = "Net0521";
 let isAdminLoggedIn = sessionStorage.getItem("tq_admin_logged") === "true";
 const SubmittedPrograms = [];
+const RegisteredPrograms = [];
 
 function loadSubmittedPrograms() {
     const saved = localStorage.getItem("tq_submitted_programs");
@@ -972,23 +987,49 @@ function saveSubmittedPrograms() {
     localStorage.setItem("tq_submitted_programs", JSON.stringify(SubmittedPrograms));
 }
 
+function loadRegisteredPrograms() {
+    const saved = localStorage.getItem("tq_registered_custom_programs");
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            RegisteredPrograms.length = 0;
+            if (Array.isArray(parsed)) {
+                parsed.forEach(p => {
+                    if (!p.id) p.id = "cprg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6);
+                    RegisteredPrograms.push(p);
+                });
+            }
+        } catch (e) {
+            console.error("Failed to load registered custom programs from localStorage", e);
+        }
+    }
+}
+
+function saveRegisteredPrograms() {
+    localStorage.setItem("tq_registered_custom_programs", JSON.stringify(RegisteredPrograms));
+}
+
 function updateAdminUI() {
     const authBox = document.getElementById("admin-modal-auth-box");
     const loggedContent = document.getElementById("admin-modal-content-box");
     const regCount = document.getElementById("admin-modal-reg-count");
+    const prgCount = document.getElementById("admin-modal-prg-count");
     const authError = document.getElementById("admin-auth-error");
     const pwInput = document.getElementById("admin-password");
 
     // Re-sync latest data from localStorage
     loadSubmittedPrograms();
+    loadRegisteredPrograms();
 
     if (isAdminLoggedIn) {
         if (authBox) authBox.style.display = "none";
         if (loggedContent) loggedContent.style.display = "block";
         if (regCount) regCount.innerText = SubmittedPrograms.length;
+        if (prgCount) prgCount.innerText = RegisteredPrograms.length;
         if (authError) authError.style.display = "none";
         if (pwInput) pwInput.value = "";
         renderSubmittedPrograms();
+        renderAdminProgramList();
     } else {
         if (authBox) authBox.style.display = "block";
         if (loggedContent) loggedContent.style.display = "none";
@@ -1069,7 +1110,107 @@ window.deleteSubmittedProgram = function(target) {
         SubmittedPrograms.splice(idx, 1);
         saveSubmittedPrograms();
         renderSubmittedPrograms();
+        const regCount = document.getElementById("admin-modal-reg-count");
+        if (regCount) regCount.innerText = SubmittedPrograms.length;
         showToast(`'${title}' 업체 정보가 삭제되었습니다.`);
+    }
+};
+
+// Render registered custom experience programs in admin modal tab 2
+function renderAdminProgramList() {
+    const container = document.getElementById("admin-prg-list-result");
+    const prgCount = document.getElementById("admin-modal-prg-count");
+    if (prgCount) prgCount.innerText = RegisteredPrograms.length;
+
+    if (!container) return;
+
+    if (RegisteredPrograms.length === 0) {
+        container.classList.remove("has-items");
+        container.innerHTML = `
+            <div class="mock-card-empty-state">
+                <i class="fa-solid fa-folder-open"></i>
+                <p>현재 등록된 체험 프로그램 내역이 없습니다.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.classList.add("has-items");
+    container.innerHTML = "";
+
+    // Reverse chronological order (newest first)
+    for (let i = RegisteredPrograms.length - 1; i >= 0; i--) {
+        const prg = RegisteredPrograms[i];
+        const daysText = Array.isArray(prg.runDays) ? prg.runDays.join(", ") : (prg.runDays || "상시");
+        const priceText = Number(prg.price) === 0 ? "무료" : Number(prg.price).toLocaleString() + "원/인";
+        const providerText = prg.provider || prg.orgName || "산림복지전문업체";
+
+        const cardHtml = `
+            <div class="admin-prg-card" data-prgid="${prg.id}">
+                <div class="admin-prg-hdr">
+                    <div class="admin-prg-title-group">
+                        <span class="sub-cat">${prg.category || "체험"}</span>
+                        <span class="sub-cat" style="background-color: #f1f3f5; color: #495057;">${prg.mode || "방문형"}</span>
+                        <span class="admin-prg-title">${prg.title}</span>
+                    </div>
+                    <button class="btn-delete-card" onclick="deleteRegisteredProgram('${prg.id}')" title="프로그램 삭제">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+                <div class="admin-prg-body">
+                    <div class="admin-prg-provider">
+                        <i class="fa-solid fa-landmark"></i> <strong>공급업체:</strong> ${providerText}
+                        ${prg.contact ? `&nbsp;|&nbsp; <i class="fa-solid fa-phone"></i> ${prg.contact}` : ''}
+                    </div>
+                    <p class="admin-prg-desc">${prg.description || ''}</p>
+                    <div class="sub-meta-grid" style="grid-template-columns: repeat(5, 1fr);">
+                        <div class="meta-field">지역/장소 <span>${prg.region} (${prg.location || '협력캠핑장'})</span></div>
+                        <div class="meta-field">운영일시 <span>[${daysText}] ${prg.runTime || ''}</span></div>
+                        <div class="meta-field">정원/소요 <span>${prg.minPeople || 1}~${prg.maxPeople || 20}명 / ${prg.duration || 60}분</span></div>
+                        <div class="meta-field">참가비 <span>${priceText}</span></div>
+                        <div class="meta-field">최소운영비 <span>${prg.minCost ? Number(prg.minCost).toLocaleString() + '원' : '-'}</span></div>
+                    </div>
+                    <div class="admin-prg-actions">
+                        <button type="button" class="btn-preview-prg" onclick="openRegisteredProgramDetailById('${prg.id}')">
+                            <i class="fa-solid fa-circle-info"></i> 숲체험 상세 팝업 미리보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += cardHtml;
+    }
+}
+
+// Global preview function for registered custom programs
+window.openRegisteredProgramDetailById = function(id) {
+    loadRegisteredPrograms();
+    const found = RegisteredPrograms.find(p => p.id === id);
+    if (found) {
+        openProgramDetailModal(found);
+    } else {
+        showToast("해당 프로그램 정보를 찾을 수 없습니다.");
+    }
+};
+
+// Global delete function for registered custom programs
+window.deleteRegisteredProgram = function(target) {
+    let idx = -1;
+    if (typeof target === "number") {
+        idx = target;
+    } else {
+        idx = RegisteredPrograms.findIndex(p => p.id === target);
+    }
+    if (idx < 0 || idx >= RegisteredPrograms.length) return;
+
+    const title = RegisteredPrograms[idx].title;
+    if (confirm(`'${title}' 체험 프로그램을 완전히 삭제하시겠습니까?\n(삭제 후 복원할 수 없습니다.)`)) {
+        RegisteredPrograms.splice(idx, 1);
+        saveRegisteredPrograms();
+        renderAdminProgramList();
+        const prgCount = document.getElementById("admin-modal-prg-count");
+        if (prgCount) prgCount.innerText = RegisteredPrograms.length;
+        showToast(`'${title}' 프로그램이 삭제되었습니다.`);
     }
 };
 
@@ -1085,6 +1226,7 @@ function initSurveyForm() {
     
     // Load stored items from localStorage
     loadSubmittedPrograms();
+    loadRegisteredPrograms();
 
     // Cross-tab real-time sync for localStorage
     window.addEventListener("storage", (e) => {
@@ -1093,7 +1235,34 @@ function initSurveyForm() {
             if (isAdminLoggedIn) {
                 renderSubmittedPrograms();
             }
+        } else if (e.key === "tq_registered_custom_programs") {
+            loadRegisteredPrograms();
+            if (isAdminLoggedIn) {
+                renderAdminProgramList();
+            }
         }
+    });
+
+    // Admin Modal Tab Switching
+    const adminTabs = document.querySelectorAll("#admin-tabs .admin-nav-tab-btn");
+    const paneCompanies = document.getElementById("admin-pane-companies");
+    const panePrograms = document.getElementById("admin-pane-programs");
+
+    adminTabs.forEach(tabBtn => {
+        tabBtn.addEventListener("click", () => {
+            adminTabs.forEach(b => b.classList.remove("active"));
+            tabBtn.classList.add("active");
+            const target = tabBtn.getAttribute("data-admin-tab");
+            if (target === "programs") {
+                if (paneCompanies) paneCompanies.style.display = "none";
+                if (panePrograms) panePrograms.style.display = "block";
+                renderAdminProgramList();
+            } else {
+                if (paneCompanies) paneCompanies.style.display = "block";
+                if (panePrograms) panePrograms.style.display = "none";
+                renderSubmittedPrograms();
+            }
+        });
     });
 
     // Open modal popup
@@ -1247,7 +1416,221 @@ function initSurveyForm() {
     }
 }
 
-// --- 9. Toast Popup Helper ---
+// --- 9. Forest Welfare Experience Program Registration (Section 14) ---
+let currentVerifiedCompany = null;
+
+function initProgramRegistration() {
+    const phoneInput = document.getElementById("auth-phone-input");
+    const btnVerifyPhone = document.getElementById("btn-verify-phone");
+    const successBanner = document.getElementById("auth-success-banner");
+    const failBanner = document.getElementById("auth-fail-banner");
+    const btnResetAuth = document.getElementById("btn-reset-phone-auth");
+    
+    const companyNameEl = document.getElementById("auth-company-name");
+    const repNameEl = document.getElementById("auth-rep-name");
+    const locationEl = document.getElementById("auth-location");
+    const contactNumEl = document.getElementById("auth-contact-num");
+    
+    const lockedPlaceholder = document.getElementById("reg-locked-placeholder");
+    const activeFormWrapper = document.getElementById("reg-active-form-wrapper");
+    const regProviderName = document.getElementById("reg-provider-name");
+    const programForm = document.getElementById("custom-program-form");
+
+    // Helper to clean phone digits for matching
+    const cleanDigits = (str) => String(str || "").replace(/[^0-9]/g, "");
+
+    const lockProgramForm = () => {
+        currentVerifiedCompany = null;
+        if (successBanner) successBanner.style.display = "none";
+        if (failBanner) failBanner.style.display = "none";
+        if (lockedPlaceholder) lockedPlaceholder.style.display = "block";
+        if (activeFormWrapper) activeFormWrapper.style.display = "none";
+        if (phoneInput) {
+            phoneInput.disabled = false;
+            phoneInput.value = "";
+        }
+    };
+
+    const unlockProgramForm = (company) => {
+        currentVerifiedCompany = company;
+        if (failBanner) failBanner.style.display = "none";
+        if (successBanner) successBanner.style.display = "block";
+        if (lockedPlaceholder) lockedPlaceholder.style.display = "none";
+        if (activeFormWrapper) activeFormWrapper.style.display = "block";
+
+        if (companyNameEl) companyNameEl.innerText = company.orgName;
+        if (repNameEl) repNameEl.innerText = company.repName;
+        const addrDisplay = company.address || (company.sido ? `${company.sido} ${company.sigungu || ''}` : company.region);
+        if (locationEl) locationEl.innerText = addrDisplay;
+        if (contactNumEl) contactNumEl.innerText = company.contact;
+        if (regProviderName) regProviderName.innerText = company.orgName;
+
+        if (phoneInput) phoneInput.disabled = true;
+    };
+
+    // Verify Phone Button Handler
+    if (btnVerifyPhone && phoneInput) {
+        btnVerifyPhone.addEventListener("click", () => {
+            const rawPhone = phoneInput.value.trim();
+            const phoneDigits = cleanDigits(rawPhone);
+
+            if (!phoneDigits || phoneDigits.length < 8) {
+                showToast("올바른 전화번호를 입력해 주세요 (최소 8자리 이상).");
+                phoneInput.focus();
+                return;
+            }
+
+            // Sync latest submissions from storage
+            loadSubmittedPrograms();
+
+            // Find matching company by contact digits or raw text match
+            const matched = SubmittedPrograms.find(p => {
+                const compDigits = cleanDigits(p.contact);
+                return compDigits === phoneDigits || (p.contact && p.contact.includes(rawPhone));
+            });
+
+            if (matched) {
+                unlockProgramForm(matched);
+                showToast(`'${matched.orgName}' 전문업체 인증 성공! 프로그램 등록 폼이 열렸습니다.`);
+            } else {
+                currentVerifiedCompany = null;
+                if (successBanner) successBanner.style.display = "none";
+                if (failBanner) failBanner.style.display = "block";
+                if (lockedPlaceholder) lockedPlaceholder.style.display = "block";
+                if (activeFormWrapper) activeFormWrapper.style.display = "none";
+                showToast("등록된 참여 신청 내역을 찾을 수 없습니다. 번호를 확인해 주세요.");
+            }
+        });
+
+        // Trigger verify on Enter in phoneInput
+        phoneInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                btnVerifyPhone.click();
+            }
+        });
+    }
+
+    // Reset Auth Button Handler
+    if (btnResetAuth) {
+        btnResetAuth.addEventListener("click", () => {
+            lockProgramForm();
+            if (phoneInput) phoneInput.focus();
+            showToast("전화번호 인증이 초기화되었습니다.");
+        });
+    }
+
+    // Preset thumbnail image dictionary
+    const presetImages = {
+        dye: {
+            url: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=600",
+            fallback: svgNaturalDye
+        },
+        tree: {
+            url: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=600",
+            fallback: svgForestCommentary
+        },
+        rope: {
+            url: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=600",
+            fallback: svgZiplineFly
+        },
+        trail: {
+            url: "https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?auto=format&fit=crop&q=80&w=600",
+            fallback: svgBarefootTrekking
+        }
+    };
+
+    // Custom Program Form Submission
+    if (programForm) {
+        programForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            if (!currentVerifiedCompany) {
+                showToast("먼저 STEP 1에서 등록 전문업체 전화번호를 인증해 주세요.");
+                return;
+            }
+
+            // Collect selected days
+            const dayCheckboxes = Array.from(document.querySelectorAll('input[name="prg-days"]:checked'));
+            const selectedDays = dayCheckboxes.length > 0 ? dayCheckboxes.map(cb => cb.value) : ["상시"];
+
+            // Collect selected image preset
+            const selectedImgRadio = document.querySelector('input[name="prg-reg-img"]:checked');
+            const imgKey = selectedImgRadio ? selectedImgRadio.value : "dye";
+            const imgData = presetImages[imgKey] || presetImages.dye;
+
+            const title = document.getElementById("prg-reg-title").value.trim();
+            const category = document.getElementById("prg-reg-category").value;
+            const mode = document.getElementById("prg-reg-mode").value;
+            const region = document.getElementById("prg-reg-region").value;
+            const targetVal = document.getElementById("prg-reg-target").value;
+            const location = document.getElementById("prg-reg-location").value.trim();
+            const duration = parseInt(document.getElementById("prg-reg-duration").value) || 60;
+            const price = parseInt(document.getElementById("prg-reg-price").value) || 0;
+            const minCost = parseInt(document.getElementById("prg-reg-min-cost").value) || 0;
+            const minPeople = parseInt(document.getElementById("prg-reg-min-people").value) || 1;
+            const maxPeople = parseInt(document.getElementById("prg-reg-max-people").value) || 20;
+            const runTime = document.getElementById("prg-reg-run-time").value.trim();
+            const desc = document.getElementById("prg-reg-desc").value.trim();
+            const prep = document.getElementById("prg-reg-prep").value.trim();
+            const rain = document.getElementById("prg-reg-rain").value.trim();
+            const cancel = document.getElementById("prg-reg-cancel").value.trim();
+
+            const targetArray = (targetVal === "all") ? ["family", "kids", "healing", "sports"] : [targetVal];
+
+            // Formatted timestamp
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const newProgram = {
+                id: "cprg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
+                title,
+                category,
+                mode,
+                region,
+                target: targetArray,
+                location,
+                duration,
+                price,
+                minCost,
+                minPeople,
+                maxPeople,
+                runDays: selectedDays,
+                runTime,
+                description: desc,
+                preparations: prep,
+                rainPolicy: rain,
+                cancelPolicy: cancel,
+                imageUrl: imgData.url,
+                fallbackUrl: imgData.fallback,
+                provider: currentVerifiedCompany.orgName,
+                companyId: currentVerifiedCompany.id,
+                contact: currentVerifiedCompany.contact,
+                repName: currentVerifiedCompany.repName,
+                registeredAt: formattedDate
+            };
+
+            // Reload latest programs from storage before saving
+            loadRegisteredPrograms();
+            RegisteredPrograms.push(newProgram);
+            saveRegisteredPrograms();
+
+            // If admin is open/logged in, refresh
+            if (isAdminLoggedIn) {
+                renderAdminProgramList();
+            }
+
+            // Reset form fields
+            document.getElementById("prg-reg-title").value = "";
+            document.getElementById("prg-reg-location").value = "";
+            document.getElementById("prg-reg-desc").value = "";
+            
+            showToast(`'${title}' 체험 프로그램이 성공적으로 등록되어 영구 저장되었습니다!`);
+        });
+    }
+}
+
+// --- 10. Toast Popup Helper ---
 function showToast(text) {
     const toast = document.getElementById("toast");
     const toastText = document.getElementById("toast-text");
@@ -1259,3 +1642,4 @@ function showToast(text) {
         toast.classList.remove("show");
     }, 3500);
 }
+
