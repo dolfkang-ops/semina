@@ -2323,6 +2323,89 @@ strong {
     resize: none;
 }
 
+.label-multi-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.badge-multi-hint {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    background-color: var(--primary-light);
+    border: 1px solid var(--primary-mint);
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.specialty-chips-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.specialty-chip {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0;
+}
+
+.specialty-chip input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.specialty-chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: #f4f6f5;
+    border: 1.5px solid #d5dfdb;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.specialty-chip:hover span {
+    border-color: var(--primary);
+    background-color: #edf5f0;
+}
+
+.specialty-chip input[type="checkbox"]:checked + span {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 2px 6px rgba(15, 81, 50, 0.12);
+    font-weight: 700;
+}
+
+.specialty-chip input[type="checkbox"]:focus + span {
+    box-shadow: 0 0 0 3px rgba(15, 81, 50, 0.15);
+}
+
+.specialty-error-msg {
+    color: #e53935;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .btn-submit-intent {
     width: 100%;
     background-color: var(--primary);
@@ -2330,7 +2413,7 @@ strong {
     padding: 12px;
     font-size: 14px;
     box-shadow: var(--shadow-sm);
-    margin-top: 10px;
+    margin-top: 14px;
 }
 
 .btn-submit-intent:hover {
@@ -2430,6 +2513,15 @@ strong {
     color: #ffffff;
     padding: 1px 6px;
     border-radius: 20px;
+}
+
+.sub-date {
+    font-size: 10px;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
 }
 
 .submitted-card-body {

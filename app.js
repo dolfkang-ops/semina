@@ -955,9 +955,15 @@ function loadSubmittedPrograms() {
         try {
             const parsed = JSON.parse(saved);
             SubmittedPrograms.length = 0;
-            parsed.forEach(p => SubmittedPrograms.push(p));
+            if (Array.isArray(parsed)) {
+                parsed.forEach(p => {
+                    if (!p.id) p.id = "sub_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6);
+                    if (!p.submittedAt) p.submittedAt = "등록 완료";
+                    SubmittedPrograms.push(p);
+                });
+            }
         } catch (e) {
-            console.error("Failed to load submitted programs", e);
+            console.error("Failed to load submitted programs from localStorage", e);
         }
     }
 }
@@ -972,6 +978,9 @@ function updateAdminUI() {
     const regCount = document.getElementById("admin-modal-reg-count");
     const authError = document.getElementById("admin-auth-error");
     const pwInput = document.getElementById("admin-password");
+
+    // Re-sync latest data from localStorage
+    loadSubmittedPrograms();
 
     if (isAdminLoggedIn) {
         if (authBox) authBox.style.display = "none";
@@ -1011,18 +1020,28 @@ function renderSubmittedPrograms() {
     // Render in reverse chronological order (newest first)
     for (let i = SubmittedPrograms.length - 1; i >= 0; i--) {
         const prg = SubmittedPrograms[i];
+        const specialties = Array.isArray(prg.specialty) 
+            ? prg.specialty 
+            : (prg.specialty ? String(prg.specialty).split(",").map(s => s.trim()) : ["산림복지"]);
+        const specialtyBadges = specialties.map(s => `<span class="sub-cat">${s}</span>`).join(" ");
+        const addressDisplay = prg.address || (prg.sido ? `${prg.sido} ${prg.sigungu || ''}` : (prg.region || '미입력'));
+
         const cardHtml = `
-            <div class="submitted-card" data-index="${i}">
+            <div class="submitted-card" data-id="${prg.id}">
                 <div class="submitted-card-hdr">
-                    <span class="sub-org">${prg.orgName}</span>
-                    <span class="sub-cat">${prg.specialty}</span>
-                    <button class="btn-delete-card" onclick="deleteSubmittedProgram(${i})" title="업체 삭제"><i class="fa-solid fa-trash"></i></button>
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span class="sub-org">${prg.orgName}</span>
+                        ${specialtyBadges}
+                        <span class="sub-date"><i class="fa-regular fa-clock"></i> ${prg.submittedAt}</span>
+                    </div>
+                    <button class="btn-delete-card" onclick="deleteSubmittedProgram('${prg.id}')" title="업체 정보 삭제"><i class="fa-solid fa-trash"></i></button>
                 </div>
                 <div class="submitted-card-body">
                     <h4>대표자/담당자: ${prg.repName}</h4>
                     <p class="sub-desc" style="margin-top: 8px;">${prg.desc}</p>
-                    <div class="sub-meta-grid" style="grid-template-columns: repeat(2, 1fr);">
-                        <div class="meta-field">활동지역 <span>${prg.region}</span></div>
+                    <div class="sub-meta-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="meta-field">소재지(군·구) <span>${addressDisplay}</span></div>
+                        <div class="meta-field">활동희망지역 <span>${prg.region}</span></div>
                         <div class="meta-field">전문인력 <span>${prg.staffCount}명</span></div>
                     </div>
                     <div class="sub-contact-row">
@@ -1035,11 +1054,19 @@ function renderSubmittedPrograms() {
     }
 }
 
-// Global deletion function bound to window
-window.deleteSubmittedProgram = function(index) {
-    if (confirm("등록된 전문업체 정보를 삭제하시겠습니까?")) {
-        const title = SubmittedPrograms[index].orgName;
-        SubmittedPrograms.splice(index, 1);
+// Global deletion function bound to window (deletes ONLY when admin clicks trash icon & confirms)
+window.deleteSubmittedProgram = function(target) {
+    let idx = -1;
+    if (typeof target === "number") {
+        idx = target;
+    } else {
+        idx = SubmittedPrograms.findIndex(p => p.id === target);
+    }
+    if (idx < 0 || idx >= SubmittedPrograms.length) return;
+
+    const title = SubmittedPrograms[idx].orgName;
+    if (confirm(`'${title}' 업체의 시범사업 참여 신청 정보를 완전히 삭제하시겠습니까?\n(삭제 후에는 복원할 수 없습니다.)`)) {
+        SubmittedPrograms.splice(idx, 1);
         saveSubmittedPrograms();
         renderSubmittedPrograms();
         showToast(`'${title}' 업체 정보가 삭제되었습니다.`);
@@ -1056,8 +1083,18 @@ function initSurveyForm() {
     const adminAuthError = document.getElementById("admin-auth-error");
     const adminPasswordInput = document.getElementById("admin-password");
     
-    // Load stored items
+    // Load stored items from localStorage
     loadSubmittedPrograms();
+
+    // Cross-tab real-time sync for localStorage
+    window.addEventListener("storage", (e) => {
+        if (e.key === "tq_submitted_programs") {
+            loadSubmittedPrograms();
+            if (isAdminLoggedIn) {
+                renderSubmittedPrograms();
+            }
+        }
+    });
 
     // Open modal popup
     if (btnOpenAdminModal && adminModal) {
@@ -1133,27 +1170,55 @@ function initSurveyForm() {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
 
-            // Get values
-            const orgName = document.getElementById("survey-org-name").value;
-            const repName = document.getElementById("survey-rep-name").value;
-            const contact = document.getElementById("survey-contact").value;
+            // Get text and select values
+            const orgName = document.getElementById("survey-org-name").value.trim();
+            const repName = document.getElementById("survey-rep-name").value.trim();
+            const contact = document.getElementById("survey-contact").value.trim();
+            const sido = document.getElementById("survey-address-sido") ? document.getElementById("survey-address-sido").value : "";
+            const sigungu = document.getElementById("survey-address-sigungu") ? document.getElementById("survey-address-sigungu").value.trim() : "";
             const staffCount = parseInt(document.getElementById("survey-staff-count").value) || 1;
-            const specialty = document.getElementById("survey-specialty").value;
             const region = document.getElementById("survey-region").value;
-            const desc = document.getElementById("survey-description").value;
+            const desc = document.getElementById("survey-description").value.trim();
 
-            // Build data structure
+            // Get multi-selected specialties
+            const selectedCheckboxes = Array.from(document.querySelectorAll('input[name="survey-specialty"]:checked'));
+            const specialtyError = document.getElementById("specialty-error");
+
+            if (selectedCheckboxes.length === 0) {
+                if (specialtyError) specialtyError.style.display = "flex";
+                showToast("주요 전문 분야를 최소 1개 이상 선택해 주세요.");
+                return;
+            } else {
+                if (specialtyError) specialtyError.style.display = "none";
+            }
+
+            const selectedSpecialties = selectedCheckboxes.map(cb => cb.value);
+            const fullAddress = sido ? `${sido} ${sigungu}` : sigungu;
+
+            // Formatted timestamp
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            // Build data structure with unique ID and permanent timestamp
             const newItem = {
+                id: "sub_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6),
                 orgName,
                 repName,
                 contact,
+                sido,
+                sigungu,
+                address: fullAddress,
                 staffCount,
-                specialty,
+                specialty: selectedSpecialties,
                 region,
-                desc
+                desc,
+                submittedAt: formattedDate
             };
 
-            // Add, save, and update view
+            // Reload latest before pushing to avoid overwriting multi-tab submissions
+            loadSubmittedPrograms();
+
+            // Add, save permanently to localStorage, and update view
             SubmittedPrograms.push(newItem);
             saveSubmittedPrograms();
             
@@ -1161,15 +1226,23 @@ function initSurveyForm() {
                 renderSubmittedPrograms();
             }
 
-            // Clear all fields
+            // Clear all input fields
             document.getElementById("survey-org-name").value = "";
             document.getElementById("survey-rep-name").value = "";
             document.getElementById("survey-contact").value = "";
+            if (document.getElementById("survey-address-sigungu")) {
+                document.getElementById("survey-address-sigungu").value = "";
+            }
             document.getElementById("survey-staff-count").value = "";
             document.getElementById("survey-description").value = "";
+            
+            // Reset specialty checkboxes (set first one checked)
+            document.querySelectorAll('input[name="survey-specialty"]').forEach((cb, idx) => {
+                cb.checked = (idx === 0);
+            });
 
             // Show toast confirmation
-            showToast(`'${orgName}' 산림복지 전문업체 참여 신청이 정상 접수되었습니다!`);
+            showToast(`'${orgName}' 산림복지 전문업체 참여 신청이 영구 저장되었습니다!`);
         });
     }
 }

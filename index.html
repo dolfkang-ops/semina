@@ -25,6 +25,7 @@
             <nav class="sidebar-links" id="sidebar-nav">
                 <ul>
                     <li><a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> 시작하기</a></li>
+                    <li><a href="#survey" class="nav-link survey-link highlight-link"><i class="fa-solid fa-file-signature"></i> 13. 참여 의향서 등록</a></li>
                     <li><a href="#background" class="nav-link"><i class="fa-solid fa-circle-info"></i> 추진 배경 & 필요성</a></li>
                     <li><a href="#simulator" class="nav-link highlight-link"><i class="fa-solid fa-wand-magic-sparkles"></i> 숲체험 매칭기</a></li>
                     <li><a href="#goals" class="nav-link"><i class="fa-solid fa-bullseye"></i> 사업 목표</a></li>
@@ -37,7 +38,6 @@
                     <li><a href="#schedule" class="nav-link"><i class="fa-solid fa-calendar-days"></i> 시범사업 일정</a></li>
                     <li><a href="#mvp-strategy" class="nav-link"><i class="fa-solid fa-bolt"></i> 빠른 MVP 운영방식</a></li>
                     <li><a href="#kpi-vision" class="nav-link"><i class="fa-solid fa-chart-simple"></i> 성과 지표 & 미래 비전</a></li>
-                    <li><a href="#survey" class="nav-link survey-link"><i class="fa-solid fa-file-signature"></i> 참여 의향서 등록</a></li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -68,8 +68,180 @@
                     </div>
 
                     <div class="action-buttons">
-                        <a href="#background" class="btn btn-hero btn-primary-hero">세미나 자료 보기 <i class="fa-solid fa-arrow-right"></i></a>
-                        <a href="#simulator" class="btn btn-hero btn-secondary-hero"><i class="fa-solid fa-wand-magic-sparkles"></i> 체험 프로그램 매칭해보기</a>
+                        <a href="#survey" class="btn btn-hero btn-primary-hero"><i class="fa-solid fa-file-signature"></i> 시범사업 참여 의향서 작성 <i class="fa-solid fa-arrow-right"></i></a>
+                        <a href="#background" class="btn btn-hero btn-secondary-hero">세미나 내용 전체보기 <i class="fa-solid fa-arrow-down"></i></a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SURVEY FORM: REGISTRATION SURVEY (PLACED AT TOP) -->
+            <section id="survey" class="section survey-section">
+                <div class="section-title-wrapper">
+                    <span class="section-num">13</span>
+                    <h2>산림복지전문업 시범사업 참여 의향서</h2>
+                    <p class="section-subtitle-text">가평·양평 숲체험 × 캠핑 융합 시범사업에 함께할 산림복지 전문업체의 참여 신청을 접수합니다.</p>
+                </div>
+
+                <div class="survey-layout">
+                    <!-- Form side -->
+                    <div class="survey-form-container card">
+                        <h3><i class="fa-regular fa-address-card"></i> 전문업체 기본 정보 입력</h3>
+                        <form id="intent-form">
+                            <!-- Row 1: Basic Company Info -->
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="survey-org-name">업체명 (기관명)</label>
+                                    <input type="text" id="survey-org-name" placeholder="예: (주)숲속향기 산림복지" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="survey-rep-name">대표자 / 담당자 성명</label>
+                                    <input type="text" id="survey-rep-name" placeholder="예: 홍길동" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="survey-contact">전화번호 (연락처)</label>
+                                    <input type="text" id="survey-contact" placeholder="예: 010-1234-5678" required>
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Address (Si/Do & Si/Gun/Gu) + Staff Count -->
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="survey-address-sido"><i class="fa-solid fa-location-dot"></i> 주소지 (시·도)</label>
+                                    <select id="survey-address-sido" required>
+                                        <option value="경기도" selected>경기도</option>
+                                        <option value="강원특별자치도">강원특별자치도</option>
+                                        <option value="서울특별시">서울특별시</option>
+                                        <option value="인천광역시">인천광역시</option>
+                                        <option value="충청북도">충청북도</option>
+                                        <option value="충청남도">충청남도</option>
+                                        <option value="대전광역시">대전광역시</option>
+                                        <option value="세종특별자치시">세종특별자치시</option>
+                                        <option value="전북특별자치도">전북특별자치도</option>
+                                        <option value="전라남도">전라남도</option>
+                                        <option value="광주광역시">광주광역시</option>
+                                        <option value="경상북도">경상북도</option>
+                                        <option value="경상남도">경상남도</option>
+                                        <option value="대구광역시">대구광역시</option>
+                                        <option value="울산광역시">울산광역시</option>
+                                        <option value="부산광역시">부산광역시</option>
+                                        <option value="제주특별자치도">제주특별자치도</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="survey-address-sigungu"><i class="fa-solid fa-map-pin"></i> 주소지 (시·군·구 단위)</label>
+                                    <input type="text" id="survey-address-sigungu" placeholder="예: 가평군, 양평군, 춘천시" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="survey-staff-count"><i class="fa-solid fa-user-group"></i> 전문 인력 수 (명)</label>
+                                    <input type="number" id="survey-staff-count" placeholder="예: 5" min="1" required>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Operation Region -->
+                            <div class="form-group">
+                                <label for="survey-region"><i class="fa-solid fa-compass"></i> 시범사업 주요 활동 희망 지역</label>
+                                <select id="survey-region">
+                                    <option value="경기 가평군">경기 가평군</option>
+                                    <option value="경기 양평군">경기 양평군</option>
+                                    <option value="가평·양평 전체" selected>가평군 & 양평군 전체</option>
+                                    <option value="수도권 및 인근권역">수도권 및 인근 권역 (강원권 연계 포함)</option>
+                                </select>
+                            </div>
+
+                            <!-- Row 4: Multi-Select Specialty Chips -->
+                            <div class="form-group">
+                                <label class="label-multi-title">
+                                    <span><i class="fa-solid fa-shapes"></i> 주요 전문 분야</span>
+                                    <span class="badge-multi-hint"><i class="fa-solid fa-circle-check"></i> 복수 선택 가능</span>
+                                </label>
+                                <div class="specialty-chips-grid">
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="숲해설" checked>
+                                        <span><i class="fa-solid fa-tree"></i> 숲해설</span>
+                                    </label>
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="산림치유">
+                                        <span><i class="fa-solid fa-spa"></i> 산림치유</span>
+                                    </label>
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="유아숲체험">
+                                        <span><i class="fa-solid fa-child-reaching"></i> 유아숲체험</span>
+                                    </label>
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="산림교육">
+                                        <span><i class="fa-solid fa-graduation-cap"></i> 산림교육</span>
+                                    </label>
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="산림레포츠">
+                                        <span><i class="fa-solid fa-person-hiking"></i> 산림레포츠</span>
+                                    </label>
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="자연공예">
+                                        <span><i class="fa-solid fa-hammer"></i> 자연공예 (목공)</span>
+                                    </label>
+                                    <label class="specialty-chip">
+                                        <input type="checkbox" name="survey-specialty" value="숲트레킹">
+                                        <span><i class="fa-solid fa-shoe-prints"></i> 숲트레킹</span>
+                                    </label>
+                                </div>
+                                <div id="specialty-error" class="specialty-error-msg" style="display: none;">
+                                    <i class="fa-solid fa-circle-exclamation"></i> 주요 전문 분야를 최소 1개 이상 선택해 주세요.
+                                </div>
+                            </div>
+
+                            <!-- Row 5: Description -->
+                            <div class="form-group">
+                                <label for="survey-description">업체 한 줄 소개 및 주요 강점</label>
+                                <textarea id="survey-description" rows="3" placeholder="참여 캠핑장 및 협력 기관이 우리 전문업체의 주요 프로그램 특징과 보유 자원을 알 수 있도록 3줄 이내로 핵심 강점을 입력하세요." required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-submit-intent"><i class="fa-solid fa-paper-plane"></i> 산림복지 전문업체 참여 신청</button>
+                        </form>
+                    </div>
+
+                    <!-- Benefit & Guide side -->
+                    <div class="survey-guide-container card">
+                        <div class="guide-header-row">
+                            <span class="guide-badge"><i class="fa-solid fa-gift"></i> 참여 혜택</span>
+                            <h3>시범사업 참여 전문업체 지원 안내</h3>
+                        </div>
+                        <p class="guide-intro">본 시범사업에 참여하는 산림복지 전문업체에게는 다음과 같은 실질적 사업화 혜택이 제공됩니다.</p>
+                        
+                        <div class="guide-benefits-list">
+                            <div class="guide-benefit-item">
+                                <div class="benefit-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                                <div class="benefit-text">
+                                    <h4>땡큐캠핑 예약 플랫폼 단독 상품 입점</h4>
+                                    <p>100만 회원을 보유한 땡큐캠핑 앱 내 '캠핑장 연계 숲체험' 단독 예약 옵션으로 노출 및 자동 정산 지원</p>
+                                </div>
+                            </div>
+                            <div class="guide-benefit-item">
+                                <div class="benefit-icon"><i class="fa-solid fa-handshake"></i></div>
+                                <div class="benefit-text">
+                                    <h4>가평·양평 우수 캠핑장 1:1 매칭</h4>
+                                    <p>방문형/이동형 프로그램 운영이 가능한 최적의 협력 캠핑장 우선 매칭 및 부대시설 사용 지원</p>
+                                </div>
+                            </div>
+                            <div class="guide-benefit-item">
+                                <div class="benefit-icon"><i class="fa-solid fa-box-open"></i></div>
+                                <div class="benefit-text">
+                                    <h4>키트 제작 및 온·오프라인 홍보 마케팅</h4>
+                                    <p>체험 키트 패키징 제작 지원, 캠핑 전문 인플루언서 팸투어 및 SNS 공동 홍보 프로모션</p>
+                                </div>
+                            </div>
+                            <div class="guide-benefit-item">
+                                <div class="benefit-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                <div class="benefit-text">
+                                    <h4>시범사업 운영 분석 데이터 리포트 제공</h4>
+                                    <p>고객 만족도, 연령대별 선호도, 매출 분석 등 2027년 본사업 확장을 위한 컨설팅 리포트 제공</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="guide-footer-callout">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>참여 신청 접수 후 담당 부서에서 순차적으로 매칭 상담 연락을 드립니다.</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -780,7 +952,6 @@
                                 <div class="tab-bullets">
                                     <ul>
                                         <li><i class="fa-solid fa-square-check text-green"></i> 참여 산림복지전문업 대상 전반적인 시범사업 안내 및 연수</li>
-                                        <li><i class="fa-solid fa-square-check text-green"></i> 프로그램 품질 규격 및 안전가이드 수립 및 적용 지원</li>
                                         <li><i class="fa-solid fa-square-check text-green"></i> 우수 대표 융합 프로그램 발굴 및 향후 전국 확산 마케팅 지원</li>
                                     </ul>
                                 </div>
@@ -997,116 +1168,6 @@
                             <span class="s-step-num">Step 4</span>
                             <h4>전국 통합 예약 플랫폼화</h4>
                             <p>전국 산림전문업-캠핑장 API 자동화 매칭 솔루션 정식 구축</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SURVEY FORM: REGISTRATION SURVEY -->
-            <section id="survey" class="section survey-section">
-                <div class="section-title-wrapper">
-                    <span class="section-num">13</span>
-                    <h2>산림복지전문업 시범사업 참여 의향서</h2>
-                    <p class="section-subtitle-text">가평·양평 숲체험 × 캠핑 융합 시범사업에 함께할 산림복지 전문업체의 참여 신청을 접수합니다.</p>
-                </div>
-
-                <div class="survey-layout">
-                    <!-- Form side -->
-                    <div class="survey-form-container card">
-                        <h3><i class="fa-regular fa-address-card"></i> 전문업체 기본 정보 입력</h3>
-                        <form id="intent-form">
-                            <div class="form-row-3">
-                                <div class="form-group">
-                                    <label for="survey-org-name">업체명 (기관명)</label>
-                                    <input type="text" id="survey-org-name" placeholder="예: (주)숲속향기 산림복지" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="survey-rep-name">대표자 / 담당자 성명</label>
-                                    <input type="text" id="survey-rep-name" placeholder="예: 홍길동" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="survey-contact">전화번호 (연락처)</label>
-                                    <input type="text" id="survey-contact" placeholder="예: 010-1234-5678" required>
-                                </div>
-                            </div>
-
-                            <div class="form-row-3">
-                                <div class="form-group">
-                                    <label for="survey-staff-count">보유 전문 인력 수 (명)</label>
-                                    <input type="number" id="survey-staff-count" placeholder="예: 5" min="1" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="survey-specialty">주요 전문 분야</label>
-                                    <select id="survey-specialty">
-                                        <option value="숲해설">숲해설 (숲체험)</option>
-                                        <option value="산림치유">산림치유 (힐링/요가)</option>
-                                        <option value="산림교육">산림교육 (생태학습)</option>
-                                        <option value="산림레포츠">산림레포츠 (밧줄/레포츠)</option>
-                                        <option value="자연공예">자연공예 (목공/만들기)</option>
-                                        <option value="종합 서비스">종합 서비스</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="survey-region">주요 활동 가능 지역</label>
-                                    <select id="survey-region">
-                                        <option value="가평군">경기 가평군</option>
-                                        <option value="양평군">경기 양평군</option>
-                                        <option value="가평·양평 전체">가평군 & 양평군 전체</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="survey-description">업체 한 줄 소개 및 주요 강점</label>
-                                <textarea id="survey-description" rows="3" placeholder="참여 캠핑장 및 협력 기관이 우리 전문업체의 주요 프로그램 특징과 보유 자원을 알 수 있도록 3줄 이내로 핵심 강점을 입력하세요." required></textarea>
-                            </div>
-
-                            <button type="submit" class="btn btn-submit-intent"><i class="fa-solid fa-paper-plane"></i> 산림복지 전문업체 참여 신청</button>
-                        </form>
-                    </div>
-
-                    <!-- Benefit & Guide side -->
-                    <div class="survey-guide-container card">
-                        <div class="guide-header-row">
-                            <span class="guide-badge"><i class="fa-solid fa-gift"></i> 참여 혜택</span>
-                            <h3>시범사업 참여 전문업체 지원 안내</h3>
-                        </div>
-                        <p class="guide-intro">본 시범사업에 참여하는 산림복지 전문업체에게는 다음과 같은 실질적 사업화 혜택이 제공됩니다.</p>
-                        
-                        <div class="guide-benefits-list">
-                            <div class="guide-benefit-item">
-                                <div class="benefit-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
-                                <div class="benefit-text">
-                                    <h4>땡큐캠핑 예약 플랫폼 단독 상품 입점</h4>
-                                    <p>100만 회원을 보유한 땡큐캠핑 앱 내 '캠핑장 연계 숲체험' 단독 예약 옵션으로 노출 및 자동 정산 지원</p>
-                                </div>
-                            </div>
-                            <div class="guide-benefit-item">
-                                <div class="benefit-icon"><i class="fa-solid fa-handshake"></i></div>
-                                <div class="benefit-text">
-                                    <h4>가평·양평 우수 캠핑장 1:1 매칭</h4>
-                                    <p>방문형/이동형 프로그램 운영이 가능한 최적의 협력 캠핑장 우선 매칭 및 부대시설 사용 지원</p>
-                                </div>
-                            </div>
-                            <div class="guide-benefit-item">
-                                <div class="benefit-icon"><i class="fa-solid fa-box-open"></i></div>
-                                <div class="benefit-text">
-                                    <h4>키트 제작 및 온·오프라인 홍보 마케팅</h4>
-                                    <p>체험 키트 패키징 제작 지원, 캠핑 전문 인플루언서 팸투어 및 SNS 공동 홍보 프로모션</p>
-                                </div>
-                            </div>
-                            <div class="guide-benefit-item">
-                                <div class="benefit-icon"><i class="fa-solid fa-chart-line"></i></div>
-                                <div class="benefit-text">
-                                    <h4>시범사업 운영 분석 데이터 리포트 제공</h4>
-                                    <p>고객 만족도, 연령대별 선호도, 매출 분석 등 2027년 본사업 확장을 위한 컨설팅 리포트 제공</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="guide-footer-callout">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <span>참여 신청 접수 후 담당 부서에서 순차적으로 매칭 상담 연락을 드립니다.</span>
                         </div>
                     </div>
                 </div>
