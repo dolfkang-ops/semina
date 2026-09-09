@@ -1794,6 +1794,9 @@ let currentVerifiedCompany = null;
 
 function initProgramRegistration() {
     const phoneInput = document.getElementById("auth-phone-input");
+    const programForm = document.getElementById("custom-program-form");
+    if (!phoneInput && !programForm) return;
+
     const btnVerifyPhone = document.getElementById("btn-verify-phone");
     const successBanner = document.getElementById("auth-success-banner");
     const failBanner = document.getElementById("auth-fail-banner");
@@ -1807,7 +1810,6 @@ function initProgramRegistration() {
     const lockedPlaceholder = document.getElementById("reg-locked-placeholder");
     const activeFormWrapper = document.getElementById("reg-active-form-wrapper");
     const regProviderName = document.getElementById("reg-provider-name");
-    const programForm = document.getElementById("custom-program-form");
 
     // Helper to clean phone digits for matching
     const cleanDigits = (str) => String(str || "").replace(/[^0-9]/g, "");
