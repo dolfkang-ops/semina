@@ -1065,19 +1065,50 @@ function initFirebase() {
     }
 }
 
-// GUI Admin Config Management for Web Server Deployment
+// --- Google Sheets Webhook Configuration (Option 2: Cloud Sync) ---
+// 웹서버 배포 시 여기에 구글 웹앱 URL(https://script.google.com/...)을 적어두시면, 
+// 사이트에 접속하는 모든 사용자(스마트폰/PC)의 신청 데이터가 구글 시트로 즉시 자동 취합됩니다.
+const DEFAULT_GOOGLE_SHEETS_WEBHOOK_URL = "";
+
+function getActiveGoogleSheetsWebhookUrl() {
+    return localStorage.getItem("tq_google_sheets_webhook_url") || DEFAULT_GOOGLE_SHEETS_WEBHOOK_URL || "";
+}
+
+function sendToGoogleSheetsWebhook(payload) {
+    const webhookUrl = getActiveGoogleSheetsWebhookUrl();
+    if (!webhookUrl) return;
+
+    try {
+        // Asynchronously post to Google Apps Script Webhook without blocking UI
+        fetch(webhookUrl, {
+            method: "POST",
+            mode: "no-cors", // Google Apps Script Web Apps require no-cors for preflight bypass
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            console.log("Google Sheets Webhook dispatched successfully:", payload.type);
+        }).catch(err => {
+            console.warn("Google Sheets Webhook dispatch notice:", err);
+        });
+    } catch (e) {
+        console.warn("Google Sheets Webhook error:", e);
+    }
+}
+
+// GUI Admin Config Management for Google Sheets Webhook
 window.toggleCloudSettingsPanel = function() {
     const body = document.getElementById("cloud-settings-body");
     const arrow = document.getElementById("cloud-cfg-arrow");
-    const textarea = document.getElementById("custom-firebase-cfg");
+    const input = document.getElementById("custom-sheets-webhook-url");
     if (!body) return;
 
     if (body.style.display === "none" || !body.style.display) {
         body.style.display = "block";
         if (arrow) arrow.innerHTML = '<i class="fa-solid fa-chevron-up"></i> 설정 닫기';
-        if (textarea) {
-            const saved = localStorage.getItem("tq_custom_firebase_cfg");
-            textarea.value = saved ? saved : JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
+        if (input) {
+            input.value = getActiveGoogleSheetsWebhookUrl();
         }
     } else {
         body.style.display = "none";
@@ -1085,44 +1116,91 @@ window.toggleCloudSettingsPanel = function() {
     }
 };
 
-window.saveCustomFirebaseConfig = function() {
-    const textarea = document.getElementById("custom-firebase-cfg");
+window.saveGoogleSheetsWebhookUrl = function() {
+    const input = document.getElementById("custom-sheets-webhook-url");
+    if (!input) return;
+    const rawUrl = input.value.trim();
+
+    if (rawUrl && !rawUrl.startsWith("http")) {
+        alert("올바른 Google Apps Script 웹앱 배포 URL(https://...)을 입력해 주세요.");
+        return;
+    }
+
+    if (rawUrl) {
+        localStorage.setItem("tq_google_sheets_webhook_url", rawUrl);
+        updateCloudSyncBadge(true);
+        alert("Google 스프레드시트 Webhook URL이 성공적으로 저장되었습니다!\n이제부터 제출되는 모든 신청 내역이 구글 시트에 실시간 자동 기록됩니다.");
+    } else {
+        localStorage.removeItem("tq_google_sheets_webhook_url");
+        updateCloudSyncBadge(false);
+        alert("Google 스프레드시트 Webhook URL이 초기화되었습니다.");
+    }
+    updateCloudSettingsStatus();
+};
+
+window.copyGoogleAppsScriptCode = function() {
+    const textarea = document.getElementById("gas-script-template");
     if (!textarea) return;
-    const raw = textarea.value.trim();
-
-    try {
-        // Try parsing JSON or JavaScript object format
-        let parsed = null;
-        if (raw.startsWith("{") && raw.endsWith("}")) {
-            parsed = JSON.parse(raw);
-        } else {
-            // Extract inside object if copied directly from JS
-            const match = raw.match(/\{[\s\S]*\}/);
-            if (match) {
-                parsed = JSON.parse(match[0]);
-            }
-        }
-
-        if (!parsed || (!parsed.databaseURL && !parsed.projectId)) {
-            alert("유효한 Firebase 설정 객체(databaseURL 또는 projectId 포함)를 입력해 주세요.");
-            return;
-        }
-
-        localStorage.setItem("tq_custom_firebase_cfg", JSON.stringify(parsed));
-        alert("클라우드 DB 설정이 성공적으로 저장되었습니다!\n새로운 DB 연동을 적용하기 위해 페이지를 새로고침합니다.");
-        location.reload();
-    } catch (e) {
-        alert("입력한 설정 형식(JSON)이 올바르지 않습니다. 정확한 설정을 입력해 주세요.\n오류: " + e.message);
-    }
+    textarea.select();
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        showToast("구글 시트 Apps Script 코드가 클립보드에 복사되었습니다!");
+    }).catch(() => {
+        document.execCommand("copy");
+        showToast("구글 시트 Apps Script 코드가 복사되었습니다!");
+    });
 };
 
-window.resetCustomFirebaseConfig = function() {
-    if (confirm("클라우드 DB 설정을 기본 초기값으로 복원하시겠습니까?")) {
-        localStorage.removeItem("tq_custom_firebase_cfg");
-        alert("기본 클라우드 설정으로 복원되었습니다. 페이지를 새로고침합니다.");
-        location.reload();
+window.testGoogleSheetsWebhook = function() {
+    const webhookUrl = getActiveGoogleSheetsWebhookUrl();
+    if (!webhookUrl) {
+        alert("먼저 위 입력창에 Google Apps Script 웹앱 Webhook URL을 입력하고 저장해 주세요.");
+        return;
     }
+
+    const testPayload = {
+        type: "company",
+        submittedAt: new Date().toLocaleString(),
+        orgName: "[연동테스트] 숲체험협동조합",
+        repName: "홍길동",
+        contact: "010-1234-5678",
+        address: "경기도 가평군",
+        region: "가평·양평 전체",
+        staffCount: 5,
+        specialty: ["숲해설", "산림치유"],
+        desc: "구글 시트 실시간 Webhook 연동 정상 작동 테스트 데이터입니다."
+    };
+
+    sendToGoogleSheetsWebhook(testPayload);
+    alert("구글 시트로 테스트 데이터 전송 요청을 보냈습니다!\n구글 스프레드시트에 [참여신청업체] 시트가 생성되고 데이터가 들어왔는지 확인해 보세요.");
 };
+
+function updateCloudSettingsStatus() {
+    const statusBadge = document.getElementById("cloud-cfg-status");
+    if (!statusBadge) return;
+    const url = getActiveGoogleSheetsWebhookUrl();
+    if (url) {
+        statusBadge.innerText = "구글 시트 실시간 연동 중";
+        statusBadge.style.background = "#e8f5e9";
+        statusBadge.style.color = "#2e7d32";
+    } else {
+        statusBadge.innerText = "Webhook URL 등록 필요";
+        statusBadge.style.background = "#fff3e0";
+        statusBadge.style.color = "#e65100";
+    }
+}
+
+function updateCloudSyncBadge(connected) {
+    const badge = document.getElementById("cloud-sync-badge");
+    if (!badge) return;
+    const url = getActiveGoogleSheetsWebhookUrl();
+    if (url || connected) {
+        badge.className = "cloud-sync-badge";
+        badge.innerHTML = '<i class="fa-solid fa-file-excel"></i> 구글 시트 실시간 동기화 중';
+    } else {
+        badge.className = "cloud-sync-badge offline";
+        badge.innerHTML = '<i class="fa-solid fa-file-excel"></i> 구글 시트 URL 등록 대기';
+    }
+}
 
 // --- CSV (Excel) Export Helpers ---
 window.exportCompaniesToCSV = function() {
@@ -1236,11 +1314,19 @@ function loadSubmittedPrograms() {
     }
 }
 
-function saveSubmittedPrograms() {
+function saveSubmittedPrograms(newItem) {
     // 1. Local backup
     localStorage.setItem("tq_submitted_programs", JSON.stringify(SubmittedPrograms));
 
-    // 2. Cloud DB sync
+    // 2. Google Sheets Webhook Dispatch
+    if (newItem) {
+        sendToGoogleSheetsWebhook({
+            type: "company",
+            ...newItem
+        });
+    }
+
+    // 3. Optional Cloud DB sync
     if (firebaseDb) {
         try {
             firebaseDb.ref("tq_submitted_programs").set(SubmittedPrograms).catch((err) => {
@@ -1270,11 +1356,19 @@ function loadRegisteredPrograms() {
     }
 }
 
-function saveRegisteredPrograms() {
+function saveRegisteredPrograms(newPrgItem) {
     // 1. Local backup
     localStorage.setItem("tq_registered_custom_programs", JSON.stringify(RegisteredPrograms));
 
-    // 2. Cloud DB sync
+    // 2. Google Sheets Webhook Dispatch
+    if (newPrgItem) {
+        sendToGoogleSheetsWebhook({
+            type: "program",
+            ...newPrgItem
+        });
+    }
+
+    // 3. Optional Cloud DB sync
     if (firebaseDb) {
         try {
             firebaseDb.ref("tq_registered_custom_programs").set(RegisteredPrograms).catch((err) => {
@@ -1298,6 +1392,7 @@ function updateAdminUI() {
     loadSubmittedPrograms();
     loadRegisteredPrograms();
     updateCloudSyncBadge(isFirebaseConnected);
+    updateCloudSettingsStatus();
 
     if (isAdminLoggedIn) {
         if (authBox) authBox.style.display = "none";
@@ -1667,7 +1762,7 @@ function initSurveyForm() {
 
             // Add, save permanently to localStorage, and update view
             SubmittedPrograms.push(newItem);
-            saveSubmittedPrograms();
+            saveSubmittedPrograms(newItem);
             
             if (isAdminLoggedIn) {
                 renderSubmittedPrograms();
@@ -1891,7 +1986,7 @@ function initProgramRegistration() {
             // Reload latest programs from storage before saving
             loadRegisteredPrograms();
             RegisteredPrograms.push(newProgram);
-            saveRegisteredPrograms();
+            saveRegisteredPrograms(newProgram);
 
             // If admin is open/logged in, refresh
             if (isAdminLoggedIn) {
