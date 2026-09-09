@@ -291,12 +291,11 @@ strong {
 .hero-section {
     position: relative;
     background-color: var(--bg-dark);
-    height: 100vh;
-    min-height: 600px;
+    min-height: 560px;
     display: flex;
     align-items: center;
     padding: 60px 80px;
-    overflow: hidden;
+    overflow: visible;
     color: #ffffff;
     max-width: 100%;
     border-bottom: none;
@@ -420,6 +419,7 @@ strong {
 .action-buttons {
     display: flex;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
 .btn {
@@ -434,11 +434,13 @@ strong {
     border: none;
     cursor: pointer;
     transition: var(--transition-fast);
+    word-break: keep-all;
 }
 
 .btn-hero {
     padding: 16px 32px;
     font-size: 16px;
+    word-break: keep-all;
 }
 
 .btn-primary-hero {
@@ -3982,9 +3984,10 @@ strong {
     }
     
     .hero-section {
-        height: 60vh;
-        min-height: 480px;
-        padding: 40px 24px;
+        height: auto;
+        min-height: auto;
+        padding: 48px 24px 40px;
+        overflow: visible;
     }
     
     .hero-content h1 {
@@ -4066,6 +4069,58 @@ strong {
 }
 
 @media (max-width: 768px) {
+    .hero-section {
+        height: auto;
+        min-height: auto;
+        padding: 40px 18px 36px;
+        overflow: visible;
+    }
+    
+    .hero-content {
+        width: 100%;
+    }
+    
+    .hero-content h1 {
+        font-size: 26px;
+        line-height: 1.35;
+        margin-bottom: 14px;
+    }
+    
+    .hero-subtitle {
+        font-size: 14px;
+        margin-bottom: 18px;
+        line-height: 1.5;
+    }
+    
+    .organizer-ribbon {
+        padding: 12px 14px;
+        gap: 8px 12px;
+        margin-bottom: 24px;
+    }
+    
+    .org-item {
+        font-size: 12px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .btn-hero {
+        width: 100%;
+        padding: 14px 18px;
+        font-size: 15px;
+        font-weight: 700;
+        text-align: center;
+        justify-content: center;
+        white-space: normal;
+        word-break: keep-all;
+        border-radius: 12px;
+        box-sizing: border-box;
+    }
+
     .grid-2col {
         grid-template-columns: 1fr;
     }
