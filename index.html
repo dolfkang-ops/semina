@@ -1471,8 +1471,9 @@
                 <!-- State 2: Admin Dashboard & Company Cards List (when logged in) -->
                 <div id="admin-modal-content-box" style="display: none;">
                     <div class="admin-modal-top-bar">
-                        <div class="admin-status-left">
+                        <div class="admin-status-left" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <span class="admin-status-badge"><i class="fa-solid fa-circle-check"></i> 관리자 인증 완료</span>
+                            <span id="cloud-sync-badge" class="cloud-sync-badge"><i class="fa-solid fa-cloud"></i> 실시간 클라우드 동기화 중</span>
                         </div>
                         <div class="admin-status-right">
                             <button id="btn-admin-logout" class="btn btn-admin-logout" title="관리자 로그아웃"><i class="fa-solid fa-arrow-right-from-bracket"></i> 로그아웃</button>
@@ -1541,6 +1542,10 @@
             <span id="toast-text">참여 의향서 제출 가상 시뮬레이션 완료!</span>
         </div>
     </div>
+
+    <!-- Firebase SDK (v9 Compat - Realtime Cloud Sync across all PCs and Mobile Devices) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <!-- JavaScript scripts -->
     <script src="app.js"></script>

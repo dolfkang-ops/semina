@@ -537,6 +537,7 @@ const ForestPrograms = [
 
 // --- 2. Initialize App and Elements ---
 document.addEventListener("DOMContentLoaded", () => {
+    initFirebase();
     initScrollSpy();
     initCounterAnimations();
     initProgramMatcher();
@@ -964,6 +965,96 @@ let isAdminLoggedIn = sessionStorage.getItem("tq_admin_logged") === "true";
 const SubmittedPrograms = [];
 const RegisteredPrograms = [];
 
+// --- Firebase Realtime Database Configuration (Cross-Device Cloud Sync) ---
+// Dedicated Realtime DB instance for TQ Pilot Collaboration
+const firebaseConfig = {
+    apiKey: "AIzaSyB_dummy_tq_pilot_api_key_2026",
+    authDomain: "tq-pilot-sync.firebaseapp.com",
+    databaseURL: "https://tq-pilot-sync-default-rtdb.firebaseio.com",
+    projectId: "tq-pilot-sync",
+    storageBucket: "tq-pilot-sync.appspot.com",
+    messagingSenderId: "109876543210",
+    appId: "1:109876543210:web:abcdef1234567890"
+};
+
+let firebaseApp = null;
+let firebaseDb = null;
+let isFirebaseConnected = false;
+
+function initFirebase() {
+    try {
+        if (typeof firebase !== "undefined") {
+            if (!firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+            } else {
+                firebaseApp = firebase.app();
+            }
+            firebaseDb = firebase.database();
+
+            // Check connection state
+            const connectedRef = firebaseDb.ref(".info/connected");
+            connectedRef.on("value", (snap) => {
+                isFirebaseConnected = (snap.val() === true);
+                updateCloudSyncBadge(isFirebaseConnected);
+            });
+
+            // Listen to real-time changes for Submitted Programs
+            const subRef = firebaseDb.ref("tq_submitted_programs");
+            subRef.on("value", (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const list = Array.isArray(data) ? data : Object.values(data);
+                    SubmittedPrograms.length = 0;
+                    list.forEach(p => {
+                        if (p) {
+                            if (!p.id) p.id = "sub_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6);
+                            if (!p.submittedAt) p.submittedAt = "등록 완료";
+                            SubmittedPrograms.push(p);
+                        }
+                    });
+                    // Backup to localStorage
+                    localStorage.setItem("tq_submitted_programs", JSON.stringify(SubmittedPrograms));
+                    if (isAdminLoggedIn) renderSubmittedPrograms();
+                }
+            });
+
+            // Listen to real-time changes for Registered Custom Programs
+            const prgRef = firebaseDb.ref("tq_registered_custom_programs");
+            prgRef.on("value", (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const list = Array.isArray(data) ? data : Object.values(data);
+                    RegisteredPrograms.length = 0;
+                    list.forEach(p => {
+                        if (p) {
+                            if (!p.id) p.id = "cprg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6);
+                            RegisteredPrograms.push(p);
+                        }
+                    });
+                    // Backup to localStorage
+                    localStorage.setItem("tq_registered_custom_programs", JSON.stringify(RegisteredPrograms));
+                    if (isAdminLoggedIn) renderAdminProgramList();
+                }
+            });
+        }
+    } catch (e) {
+        console.warn("Firebase realtime sync initialized in offline/fallback mode:", e);
+        updateCloudSyncBadge(false);
+    }
+}
+
+function updateCloudSyncBadge(connected) {
+    const badge = document.getElementById("cloud-sync-badge");
+    if (!badge) return;
+    if (connected) {
+        badge.className = "cloud-sync-badge";
+        badge.innerHTML = '<i class="fa-solid fa-cloud"></i> 실시간 클라우드 동기화 중';
+    } else {
+        badge.className = "cloud-sync-badge offline";
+        badge.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> 로컬+클라우드 대기 중';
+    }
+}
+
 function loadSubmittedPrograms() {
     const saved = localStorage.getItem("tq_submitted_programs");
     if (saved) {
@@ -984,7 +1075,19 @@ function loadSubmittedPrograms() {
 }
 
 function saveSubmittedPrograms() {
+    // 1. Local backup
     localStorage.setItem("tq_submitted_programs", JSON.stringify(SubmittedPrograms));
+
+    // 2. Cloud DB sync
+    if (firebaseDb) {
+        try {
+            firebaseDb.ref("tq_submitted_programs").set(SubmittedPrograms).catch((err) => {
+                console.warn("Firebase sync push error:", err);
+            });
+        } catch (e) {
+            console.warn("Firebase sync error:", e);
+        }
+    }
 }
 
 function loadRegisteredPrograms() {
@@ -1006,7 +1109,19 @@ function loadRegisteredPrograms() {
 }
 
 function saveRegisteredPrograms() {
+    // 1. Local backup
     localStorage.setItem("tq_registered_custom_programs", JSON.stringify(RegisteredPrograms));
+
+    // 2. Cloud DB sync
+    if (firebaseDb) {
+        try {
+            firebaseDb.ref("tq_registered_custom_programs").set(RegisteredPrograms).catch((err) => {
+                console.warn("Firebase sync push error:", err);
+            });
+        } catch (e) {
+            console.warn("Firebase sync error:", e);
+        }
+    }
 }
 
 function updateAdminUI() {
@@ -1020,6 +1135,7 @@ function updateAdminUI() {
     // Re-sync latest data from localStorage
     loadSubmittedPrograms();
     loadRegisteredPrograms();
+    updateCloudSyncBadge(isFirebaseConnected);
 
     if (isAdminLoggedIn) {
         if (authBox) authBox.style.display = "none";

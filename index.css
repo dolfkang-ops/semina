@@ -3012,7 +3012,35 @@ strong {
     font-size: 12.5px;
     font-weight: 700;
     color: var(--primary);
-    margin-right: 14px;
+    margin-right: 4px;
+}
+
+.cloud-sync-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.cloud-sync-badge i {
+    animation: cloudPulse 2s infinite ease-in-out;
+}
+
+@keyframes cloudPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.7; }
+}
+
+.cloud-sync-badge.offline {
+    background-color: #fff3e0;
+    color: #e65100;
+    border-color: #ffcc80;
 }
 
 .admin-total-text {
