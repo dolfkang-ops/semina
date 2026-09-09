@@ -3780,6 +3780,49 @@ strong {
     animation: fadeIn 0.3s ease;
 }
 
+.admin-pane-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background-color: #f7faf8;
+    border-radius: 8px;
+    border: 1px solid #e2ece5;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pane-action-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+
+.pane-action-desc i {
+    color: var(--primary);
+}
+
+.btn-export-csv {
+    background-color: #2e7d32;
+    color: #ffffff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition-fast);
+}
+
+.btn-export-csv:hover {
+    background-color: #1b5e20;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
 /* Admin Program Card Styling */
 .admin-prg-card {
     background: #ffffff;

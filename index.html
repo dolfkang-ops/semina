@@ -1492,6 +1492,12 @@
 
                     <!-- Tab Pane 1: Submitted Companies -->
                     <div id="admin-pane-companies" class="admin-tab-pane active">
+                        <div class="admin-pane-actions">
+                            <span class="pane-action-desc"><i class="fa-solid fa-circle-info"></i> 전체 참여 신청 업체를 엑셀(CSV)로 저장하거나 관리합니다.</span>
+                            <button type="button" class="btn btn-export-csv" onclick="exportCompaniesToCSV()">
+                                <i class="fa-solid fa-file-excel"></i> 엑셀(CSV) 다운로드
+                            </button>
+                        </div>
                         <div class="admin-modal-card-list" id="mock-preview-result">
                             <div class="mock-card-empty-state">
                                 <i class="fa-solid fa-folder-open"></i>
@@ -1502,10 +1508,41 @@
 
                     <!-- Tab Pane 2: Registered Experience Programs -->
                     <div id="admin-pane-programs" class="admin-tab-pane" style="display: none;">
+                        <div class="admin-pane-actions">
+                            <span class="pane-action-desc"><i class="fa-solid fa-circle-info"></i> 등록된 모든 숲체험 프로그램의 운영 스펙을 엑셀로 내보냅니다.</span>
+                            <button type="button" class="btn btn-export-csv" onclick="exportProgramsToCSV()">
+                                <i class="fa-solid fa-file-excel"></i> 프로그램 엑셀(CSV) 다운로드
+                            </button>
+                        </div>
                         <div class="admin-modal-card-list" id="admin-prg-list-result">
                             <div class="mock-card-empty-state">
                                 <i class="fa-solid fa-folder-open"></i>
                                 <p>현재 등록된 체험 프로그램 내역이 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cloud DB Settings Section for Easy Deployment -->
+                    <div class="admin-cloud-settings card" style="margin-top: 24px; padding: 16px; background-color: #fbfdfc; border: 1px dashed var(--primary-mint); border-radius: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleCloudSettingsPanel()">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-gear text-green" style="font-size: 16px;"></i>
+                                <strong style="font-size: 13.5px; color: var(--primary-dark);">실서버 클라우드 DB(Firebase) 연동 설정</strong>
+                                <span id="cloud-cfg-status" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #e8f5e9; color: #2e7d32; font-weight: 700;">작동 준비됨</span>
+                            </div>
+                            <span id="cloud-cfg-arrow" style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-chevron-down"></i> 설정 열기</span>
+                        </div>
+                        <div id="cloud-settings-body" style="display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                                본 웹사이트를 Cafe24, AWS, 깃허브 페이지, 일반 웹호스팅 등 <strong>실제 인터넷 웹서버에 배포</strong>할 때, 
+                                구글 Firebase 무료 콘솔에서 발급받은 <code>firebaseConfig</code> 값을 아래에 붙여넣기만 하면 <strong>소스 파일 수정 없이 즉시 전 기기 실시간 동기화가 활성화</strong>됩니다.
+                            </p>
+                            <div style="margin-bottom: 8px;">
+                                <textarea id="custom-firebase-cfg" rows="4" style="width: 100%; font-family: monospace; font-size: 11.5px; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);" placeholder="Firebase 콘솔의 firebaseConfig JSON 또는 스크립트 붙여넣기 (예: { databaseURL: 'https://...', ... })"></textarea>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                <button type="button" class="btn btn-outline" style="font-size: 12px; padding: 6px 14px;" onclick="resetCustomFirebaseConfig()">기본값으로 복원</button>
+                                <button type="button" class="btn btn-primary" style="font-size: 12px; padding: 6px 14px;" onclick="saveCustomFirebaseConfig()"><i class="fa-solid fa-floppy-disk"></i> 클라우드 DB 설정 적용</button>
                             </div>
                         </div>
                     </div>

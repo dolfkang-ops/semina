@@ -966,9 +966,9 @@ const SubmittedPrograms = [];
 const RegisteredPrograms = [];
 
 // --- Firebase Realtime Database Configuration (Cross-Device Cloud Sync) ---
-// Dedicated Realtime DB instance for TQ Pilot Collaboration
-const firebaseConfig = {
-    apiKey: "AIzaSyB_dummy_tq_pilot_api_key_2026",
+// Load custom Firebase configuration from localStorage if administrator configured it
+const DEFAULT_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyB_tq_pilot_ready_key_2026",
     authDomain: "tq-pilot-sync.firebaseapp.com",
     databaseURL: "https://tq-pilot-sync-default-rtdb.firebaseio.com",
     projectId: "tq-pilot-sync",
@@ -977,19 +977,41 @@ const firebaseConfig = {
     appId: "1:109876543210:web:abcdef1234567890"
 };
 
+function getActiveFirebaseConfig() {
+    const saved = localStorage.getItem("tq_custom_firebase_cfg");
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.error("Invalid custom Firebase config in storage:", e);
+        }
+    }
+    return DEFAULT_FIREBASE_CONFIG;
+}
+
 let firebaseApp = null;
 let firebaseDb = null;
 let isFirebaseConnected = false;
 
 function initFirebase() {
+    const activeCfg = getActiveFirebaseConfig();
     try {
         if (typeof firebase !== "undefined") {
             if (!firebase.apps.length) {
-                firebaseApp = firebase.initializeApp(firebaseConfig);
+                firebaseApp = firebase.initializeApp(activeCfg);
             } else {
                 firebaseApp = firebase.app();
             }
             firebaseDb = firebase.database();
+
+            // Update status indicator
+            const statusBadge = document.getElementById("cloud-cfg-status");
+            if (statusBadge) {
+                const isCustom = !!localStorage.getItem("tq_custom_firebase_cfg");
+                statusBadge.innerText = isCustom ? "사용자 클라우드 DB 연결됨" : "공용 클라우드 동기화 준비됨";
+                statusBadge.style.background = isCustom ? "#e3f2fd" : "#e8f5e9";
+                statusBadge.style.color = isCustom ? "#1565c0" : "#2e7d32";
+            }
 
             // Check connection state
             const connectedRef = firebaseDb.ref(".info/connected");
@@ -1042,6 +1064,146 @@ function initFirebase() {
         updateCloudSyncBadge(false);
     }
 }
+
+// GUI Admin Config Management for Web Server Deployment
+window.toggleCloudSettingsPanel = function() {
+    const body = document.getElementById("cloud-settings-body");
+    const arrow = document.getElementById("cloud-cfg-arrow");
+    const textarea = document.getElementById("custom-firebase-cfg");
+    if (!body) return;
+
+    if (body.style.display === "none" || !body.style.display) {
+        body.style.display = "block";
+        if (arrow) arrow.innerHTML = '<i class="fa-solid fa-chevron-up"></i> 설정 닫기';
+        if (textarea) {
+            const saved = localStorage.getItem("tq_custom_firebase_cfg");
+            textarea.value = saved ? saved : JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
+        }
+    } else {
+        body.style.display = "none";
+        if (arrow) arrow.innerHTML = '<i class="fa-solid fa-chevron-down"></i> 설정 열기';
+    }
+};
+
+window.saveCustomFirebaseConfig = function() {
+    const textarea = document.getElementById("custom-firebase-cfg");
+    if (!textarea) return;
+    const raw = textarea.value.trim();
+
+    try {
+        // Try parsing JSON or JavaScript object format
+        let parsed = null;
+        if (raw.startsWith("{") && raw.endsWith("}")) {
+            parsed = JSON.parse(raw);
+        } else {
+            // Extract inside object if copied directly from JS
+            const match = raw.match(/\{[\s\S]*\}/);
+            if (match) {
+                parsed = JSON.parse(match[0]);
+            }
+        }
+
+        if (!parsed || (!parsed.databaseURL && !parsed.projectId)) {
+            alert("유효한 Firebase 설정 객체(databaseURL 또는 projectId 포함)를 입력해 주세요.");
+            return;
+        }
+
+        localStorage.setItem("tq_custom_firebase_cfg", JSON.stringify(parsed));
+        alert("클라우드 DB 설정이 성공적으로 저장되었습니다!\n새로운 DB 연동을 적용하기 위해 페이지를 새로고침합니다.");
+        location.reload();
+    } catch (e) {
+        alert("입력한 설정 형식(JSON)이 올바르지 않습니다. 정확한 설정을 입력해 주세요.\n오류: " + e.message);
+    }
+};
+
+window.resetCustomFirebaseConfig = function() {
+    if (confirm("클라우드 DB 설정을 기본 초기값으로 복원하시겠습니까?")) {
+        localStorage.removeItem("tq_custom_firebase_cfg");
+        alert("기본 클라우드 설정으로 복원되었습니다. 페이지를 새로고침합니다.");
+        location.reload();
+    }
+};
+
+// --- CSV (Excel) Export Helpers ---
+window.exportCompaniesToCSV = function() {
+    loadSubmittedPrograms();
+    if (SubmittedPrograms.length === 0) {
+        showToast("다운로드할 참여 신청 업체 내역이 없습니다.");
+        return;
+    }
+
+    const headers = ["신청일시", "업체명", "대표자명", "연락처", "소재지", "활동희망지역", "전문인력수", "전문분야", "소개글"];
+    const rows = SubmittedPrograms.map(p => {
+        const specs = Array.isArray(p.specialty) ? p.specialty.join("; ") : (p.specialty || "");
+        const addr = p.address || (p.sido ? `${p.sido} ${p.sigungu || ''}` : p.region);
+        return [
+            `"${p.submittedAt || ''}"`,
+            `"${(p.orgName || '').replace(/"/g, '""')}"`,
+            `"${(p.repName || '').replace(/"/g, '""')}"`,
+            `"${(p.contact || '').replace(/"/g, '""')}"`,
+            `"${(addr || '').replace(/"/g, '""')}"`,
+            `"${(p.region || '').replace(/"/g, '""')}"`,
+            `"${p.staffCount || 1}"`,
+            `"${specs.replace(/"/g, '""')}"`,
+            `"${(p.desc || '').replace(/"/g, '""')}"`
+        ];
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `가평양평_시범사업_참여업체명단_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast("참여 신청 업체 목록이 엑셀(CSV) 파일로 다운로드되었습니다!");
+};
+
+window.exportProgramsToCSV = function() {
+    loadRegisteredPrograms();
+    if (RegisteredPrograms.length === 0) {
+        showToast("다운로드할 등록 체험 프로그램 내역이 없습니다.");
+        return;
+    }
+
+    const headers = ["등록일시", "프로그램명", "분야", "운영형태", "권역", "공급업체", "연락처", "진행장소", "소요시간(분)", "참가비(원)", "최소운영비(원)", "정원(최소~최대)", "운영요일", "시간대", "소개글", "준비물", "우천대안", "취소규정"];
+    const rows = RegisteredPrograms.map(p => {
+        const days = Array.isArray(p.runDays) ? p.runDays.join("; ") : (p.runDays || "상시");
+        return [
+            `"${p.registeredAt || ''}"`,
+            `"${(p.title || '').replace(/"/g, '""')}"`,
+            `"${(p.category || '').replace(/"/g, '""')}"`,
+            `"${(p.mode || '').replace(/"/g, '""')}"`,
+            `"${(p.region || '').replace(/"/g, '""')}"`,
+            `"${(p.provider || '').replace(/"/g, '""')}"`,
+            `"${(p.contact || '').replace(/"/g, '""')}"`,
+            `"${(p.location || '').replace(/"/g, '""')}"`,
+            `"${p.duration || 60}"`,
+            `"${p.price || 0}"`,
+            `"${p.minCost || 0}"`,
+            `"${p.minPeople || 1}~${p.maxPeople || 20}명"`,
+            `"${days}"`,
+            `"${(p.runTime || '').replace(/"/g, '""')}"`,
+            `"${(p.description || '').replace(/"/g, '""')}"`,
+            `"${(p.preparations || '').replace(/"/g, '""')}"`,
+            `"${(p.rainPolicy || '').replace(/"/g, '""')}"`,
+            `"${(p.cancelPolicy || '').replace(/"/g, '""')}"`
+        ];
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `가평양평_시범사업_등록체험프로그램_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast("등록 프로그램 목록이 엑셀(CSV) 파일로 다운로드되었습니다!");
+};
 
 function updateCloudSyncBadge(connected) {
     const badge = document.getElementById("cloud-sync-badge");
